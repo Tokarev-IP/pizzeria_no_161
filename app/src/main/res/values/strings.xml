@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Pizzeria No 161</string>
+    <string name="menu">Menu</string>
+    <string name="new_orders">New Orders</string>
+    <string name="completed_orders">Completed Orders</string>
+    <string name="edit_pizza">Edit Pizza</string>
+    <string name="select_image">Select image</string>
+    <string name="name">Name</string>
+    <string name="price">Price</string>
+    <string name="description">Description</string>
+    <string name="clear_pizza_image_button">Clear Pizza Image Button</string>
+    <string name="save">Save</string>
+    <string name="saved">Saved</string>
+    <string name="add_pizza">Add Pizza</string>
+    <string name="status_completed">Status: Completed</string>
+    <string name="status_new_order">Status: New Order</string>
+    <string name="no_orders">No Orders</string>
+    <string name="main">Main</string>
+    <string name="icon_back_button">Icon Back Button</string>
+    <string name="delete">Delete</string>
+    <string name="accept">Accept</string>
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
+    <string name="clear">Clear</string>
+    <string name="delete_this_pizza">Do you want to Delete this Pizza?</string>"
+    <string name="try_again">Try Again</string>
+    <string name="there_is_an_error">There is an error. Try Again.</string>
+    <string name="error">Error</string>
+    <string name="mark_as_completed_order">Mark as Completed Order</string>
+    <string name="mark_as_new_order">Mark as New Order</string>
+    <string name="delete_this_order">Do you want to Delete this Order?</string>
+</resources>
