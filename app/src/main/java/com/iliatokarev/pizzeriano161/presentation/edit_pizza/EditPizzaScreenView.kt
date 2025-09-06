@@ -19,6 +19,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,9 +28,9 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -63,7 +64,7 @@ fun EditPizzaScreenView(
     onSavePizzaClicked: (name: String, price: Float, description: String) -> Unit,
     onTryAgainClicked: () -> Unit,
 ) {
-    Box(modifier = modifier) {
+    Box(modifier = modifier.fillMaxSize()) {
         if (uiState.isInitialLoading)
             ShimmedView()
         else if (uiState.isDownloadError)
@@ -71,7 +72,7 @@ fun EditPizzaScreenView(
         else {
             pizzaData?.let {
                 if (uiState.isLoading)
-                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
 
                 EditPizzaView(
                     pizzaData = it,
@@ -82,7 +83,6 @@ fun EditPizzaScreenView(
                     },
                     isLoading = uiState.isLoading,
                     isSavedSuccessfully = uiState.isSaveSuccess,
-                    isUpdateError = uiState.isUploadError,
                 )
             } ?: run {
                 ShimmedView()
@@ -100,7 +100,6 @@ private fun EditPizzaView(
     onSavePizzaClicked: (name: String, price: Float, description: String) -> Unit = { _, _, _ -> },
     isLoading: Boolean = false,
     isSavedSuccessfully: Boolean = false,
-    isUpdateError: Boolean = false,
 ) {
     LazyColumn(
         modifier = modifier
@@ -109,14 +108,14 @@ private fun EditPizzaView(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         item {
-            Spacer(modifier = Modifier.height(60.dp))
+            Spacer(modifier = Modifier.height(20.dp))
             ChooseImageView(
                 pizzaData = pizzaData,
                 onClearImageClicked = { onClearImageClicked() },
                 onSelectImageClicked = { onSelectedImageClicked() },
                 isLoading = isLoading,
             )
-            Spacer(modifier = Modifier.height(60.dp))
+            Spacer(modifier = Modifier.height(20.dp))
             PizzaTextView(
                 pizzaData = pizzaData,
                 onSavePizzaClicked = { name, price, description ->
@@ -124,7 +123,6 @@ private fun EditPizzaView(
                 },
                 isLoading = isLoading,
                 isSavedSuccessfully = isSavedSuccessfully,
-                isUpdateError = isUpdateError,
             )
         }
     }
@@ -206,12 +204,10 @@ private fun PizzaTextView(
     onSavePizzaClicked: (name: String, price: Float, description: String) -> Unit,
     isLoading: Boolean,
     isSavedSuccessfully: Boolean,
-    isUpdateError: Boolean,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    var isSaved by remember { mutableStateOf(isSavedSuccessfully) }
-    var isSavedError by remember { mutableStateOf(isUpdateError) }
+    var isSaved by rememberSaveable { mutableStateOf(false) }
 
     var nameString by rememberSaveable { mutableStateOf(pizzaData.name) }
     var priceString by rememberSaveable { mutableStateOf(pizzaData.price.toString()) }
@@ -221,16 +217,38 @@ private fun PizzaTextView(
     var isPriceStringError by rememberSaveable { mutableStateOf(false) }
     var isDescriptionStringError by rememberSaveable { mutableStateOf(false) }
 
+    val pizzaImageUri = pizzaData.photoUriFirebase?.toUri() ?: pizzaData.photoUri
+    var isPizzaImageError by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(pizzaData) {
+        if (pizzaImageUri != null)
+            isPizzaImageError = false
+    }
+
+    LaunchedEffect(isSavedSuccessfully) {
+        isSaved = isSavedSuccessfully
+    }
+
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        AnimatedVisibility(
+            visible = isPizzaImageError,
+        ) {
+            Text(
+                text = stringResource(R.string.no_image_error),
+                fontWeight = FontWeight.Normal,
+                fontSize = 20.sp,
+            )
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+
         OutlinedTextField(
             value = nameString,
             onValueChange = { textValue ->
                 isNameStringError = false
                 isSaved = false
-                isSavedError = false
                 if (textValue.length < 100)
                     nameString = textValue
             },
@@ -255,7 +273,6 @@ private fun PizzaTextView(
             onValueChange = { textValue ->
                 isPriceStringError = false
                 isSaved = false
-                isSavedError = false
                 if (textValue.length < 10)
                     priceString = textValue
             },
@@ -280,7 +297,6 @@ private fun PizzaTextView(
             onValueChange = { textValue ->
                 isDescriptionStringError = false
                 isSaved = false
-                isSavedError = false
                 if (textValue.length < 500)
                     descriptionString = textValue
             },
@@ -300,17 +316,6 @@ private fun PizzaTextView(
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        AnimatedVisibility(
-            visible = isSavedError,
-        ) {
-            Text(
-                text = stringResource(R.string.there_is_an_error),
-                fontWeight = FontWeight.Normal,
-                fontSize = 20.sp,
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
         OutlinedButton(
             onClick = {
                 if (nameString.isEmpty())
@@ -319,7 +324,10 @@ private fun PizzaTextView(
                     isPriceStringError = true
                 if (descriptionString.isEmpty())
                     isDescriptionStringError = true
-                if (!isNameStringError && !isPriceStringError && !isDescriptionStringError) {
+                if (pizzaImageUri == null)
+                    isPizzaImageError = true
+
+                if (!isNameStringError && !isPriceStringError && !isDescriptionStringError && !isPizzaImageError) {
                     onSavePizzaClicked(
                         nameString,
                         priceString.toFloatOrNull() ?: 0F,

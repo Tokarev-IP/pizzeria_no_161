@@ -1,5 +1,7 @@
 package com.iliatokarev.pizzeriano161.presentation.edit_pizza
 
+import android.content.Context
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -7,8 +9,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.iliatokarev.pizzeriano161.R
@@ -22,9 +26,19 @@ fun EditPizzaScreen(
     editPizzaViewModel: EditPizzaViewModel,
     mainViewModel: MainViewModel,
     pizzaId: String?,
+    localContext: Context = LocalContext.current
 ) {
     val uiState by editPizzaViewModel.getUiState().collectAsStateWithLifecycle()
     val pizzaData by editPizzaViewModel.getPizzaDataFlow().collectAsStateWithLifecycle()
+
+    LaunchedEffect(key1 = uiState) {
+        if (uiState.isUploadError)
+            Toast.makeText(
+                localContext,
+                R.string.there_is_an_error,
+                Toast.LENGTH_SHORT,
+            ).show()
+    }
 
     val choosePhotoLaunch = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
