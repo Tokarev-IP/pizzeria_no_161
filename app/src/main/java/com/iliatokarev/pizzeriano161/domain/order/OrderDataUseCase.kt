@@ -2,6 +2,7 @@ package com.iliatokarev.pizzeriano161.domain.order
 
 import com.iliatokarev.pizzeriano161.data.FirebaseFirestoreOrderInterface
 import com.iliatokarev.pizzeriano161.data.toOrderData
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
 
 class OrderDataUseCase(
@@ -22,6 +23,7 @@ class OrderDataUseCase(
 
     override suspend fun uploadOrderData(orderData: OrderData) {
         withTimeout(TIMEOUT_TIME) {
+            delay(SHORT_DELAY)
             firebaseFirestoreOrder.uploadOrderData(
                 data = orderData.toFirebaseOrderData(),
                 documentName = orderData.id,
@@ -31,6 +33,7 @@ class OrderDataUseCase(
 
     override suspend fun deleteOrderData(orderId: String) {
         withTimeout(TIMEOUT_TIME) {
+            delay(SHORT_DELAY)
             firebaseFirestoreOrder.deleteOrderData(
                 documentName = orderId,
             )
@@ -46,3 +49,4 @@ interface OrderDataUseCaseInterface {
 }
 
 private const val TIMEOUT_TIME = 15000L
+private const val SHORT_DELAY = 1500L

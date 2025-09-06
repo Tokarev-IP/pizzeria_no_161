@@ -17,7 +17,7 @@ data class OrderData(
 
 fun OrderData.toFirebaseOrderData() = FirebaseOrderData(
     id = id,
-    isCompleted = isCompleted,
+    completed = isCompleted,
     sum = sum,
     consumerName = consumerName,
     consumerEmail = consumerEmail,

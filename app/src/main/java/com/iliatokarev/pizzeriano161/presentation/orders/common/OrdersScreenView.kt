@@ -67,7 +67,6 @@ fun UncompletedOrdersScreenView(
             if (uiState.isLoading)
                 LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
             OrdersView(
-                modifier = modifier,
                 orderDataList = orderDataList,
                 isLoading = uiState.isLoading,
                 onChangeCompletedState = { orderData ->
@@ -101,7 +100,6 @@ fun CompletedOrdersScreenView(
             if (uiState.isLoading)
                 LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
             OrdersView(
-                modifier = modifier,
                 orderDataList = orderDataList,
                 isLoading = uiState.isLoading,
                 onChangeCompletedState = { orderData ->
@@ -165,8 +163,6 @@ private fun OrderItemView(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        onClick = { onChangeCompletedState(orderData) },
-        enabled = !isLoading,
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -255,10 +251,10 @@ private fun OrderItemPizzaInfo(
     Column(modifier = modifier) {
         for (pizza in orderData.pizzaList) {
             ElevatedCard(
-                modifier = Modifier.padding(vertical = 4.dp),
+                modifier = Modifier.padding(vertical = 4.dp, horizontal = 4.dp),
             ) {
                 Text(
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                     text = pizza,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
@@ -307,11 +303,6 @@ private fun OrderSubmenuBox(
                     )
                 }
             )
-        }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
             DropdownMenuItem(
                 text = {
                     AnimatedContent(
@@ -325,7 +316,7 @@ private fun OrderSubmenuBox(
                 },
                 onClick = {
                     expanded = false
-                    onChangeCompletedState
+                    onChangeCompletedState()
                 },
                 leadingIcon = {
                     Icon(
