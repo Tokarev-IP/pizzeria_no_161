@@ -3,20 +3,14 @@ package com.iliatokarev.pizzeriano161.data
 import com.iliatokarev.pizzeriano161.basic.TimeUtilsForOrder
 import com.iliatokarev.pizzeriano161.domain.order.OrderData
 import com.iliatokarev.pizzeriano161.domain.pizza.PizzaData
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 class FirebasePizzaData(
-    @SerialName("id")
     val id: String = "",
-    @SerialName("name")
     val name: String = "",
-    @SerialName("price")
     val price: Float = 0F,
-    @SerialName("description")
     val description: String = "",
-    @SerialName("photo_uri")
     val photoUri: String? = null,
 )
 
@@ -33,29 +27,20 @@ fun FirebasePizzaData.toPizzaData(): PizzaData {
 
 @Serializable
 class FirebaseOrderData(
-    @SerialName("id")
-    val id: String,
-    @SerialName("is_completed")
-    val isCompleted: Boolean,
-    @SerialName("sum")
-    val sum: Float,
-    @SerialName("consumer_name")
-    val consumerName: String,
-    @SerialName("consumer_email")
-    val consumerEmail: String,
-    @SerialName("consumer_phone")
-    val consumerPhone: String,
-    @SerialName("pizza_list")
-    val pizzaList: List<String>,
-    @SerialName("additional_info")
-    val additionalInfo: String,
-    @SerialName("time")
-    val time: Long,
+    val id: String = "",
+    val completed: Boolean = false,
+    val sum: Float = 0.0F,
+    val consumerName: String = "",
+    val consumerEmail: String = "",
+    val consumerPhone: String = "",
+    val pizzaList: List<String> = emptyList(),
+    val additionalInfo: String = "",
+    val time: Long = 0L,
 )
 
 fun FirebaseOrderData.toOrderData() = OrderData(
     id = this.id,
-    isCompleted = this.isCompleted,
+    isCompleted = this.completed,
     sum = this.sum,
     consumerName = this.consumerName,
     consumerEmail = this.consumerEmail,

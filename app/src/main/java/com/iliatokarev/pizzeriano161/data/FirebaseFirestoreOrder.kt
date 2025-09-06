@@ -36,7 +36,7 @@ class FirebaseFirestoreOrder() : FirebaseFirestoreOrderInterface, FirebaseFirest
     ): List<FirebaseOrderData> {
         return getEqualCollectionDataDescending<FirebaseOrderData>(
             collectionPath = collectionPath,
-            equalField = "is_completed",
+            equalField = "completed",
             equalValue = true,
             orderBy = "time",
         )
@@ -47,7 +47,7 @@ class FirebaseFirestoreOrder() : FirebaseFirestoreOrderInterface, FirebaseFirest
     ): List<FirebaseOrderData> {
         return getEqualCollectionDataDescending<FirebaseOrderData>(
             collectionPath = collectionPath,
-            equalField = "is_completed",
+            equalField = "completed",
             equalValue = false,
             orderBy = "time",
         )

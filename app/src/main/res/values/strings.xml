@@ -29,4 +29,5 @@
     <string name="mark_as_completed_order">Mark as Completed Order</string>
     <string name="mark_as_new_order">Mark as New Order</string>
     <string name="delete_this_order">Do you want to Delete this Order?</string>
+    <string name="no_image_error">No Image. Please, Select Image</string>
 </resources>

@@ -47,6 +47,7 @@ class PizzaDataUseCase(
             delay(SHORT_DELAY)
             firebaseStorage.deletePhoto(name = pizzaId)
             firebaseStorage.deleteCompressedPhoto(name = pizzaId)
+
             firebaseFirestorePizza.deletePizzaData(documentName = pizzaId)
         }
     }
@@ -59,6 +60,6 @@ interface PizzaDataUseCaseInterface {
     suspend fun deletePizzaData(pizzaId: String)
 }
 
-private const val SHORT_DELAY = 1000L
+private const val SHORT_DELAY = 1500L
 private const val DELAY_TIME = 10000L
 private const val TIMEOUT_TIME = 30000L
