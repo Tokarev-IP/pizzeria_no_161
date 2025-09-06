@@ -76,6 +76,7 @@ class CompletedOrdersViewModel(
                 when (this) {
                     is OrderDataResponse.OrderDataSuccess -> {
                         setCompletedOrdersList(this.orderDataList)
+                        setUiState(CompletedOrdersUiState())
                     }
 
                     is OrderDataResponse.OrderDataError -> {

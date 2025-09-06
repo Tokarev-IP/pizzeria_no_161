@@ -51,7 +51,7 @@ class UncompletedOrdersViewModel(
     private fun getUncompletedOrders() {
         viewModelScope.launch {
             setUiState(UncompletedOrdersUiState(isInitialLoading = true))
-            ordersUseCase.getCompletedOrders().apply {
+            ordersUseCase.getNewOrders().apply {
                 when (this) {
                     is OrderDataResponse.OrderDataSuccess -> {
                         setUncompletedOrdersList(this.orderDataList)
