@@ -17,7 +17,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.iliatokarev.pizzeriano161.R
 import com.iliatokarev.pizzeriano161.basic.BasicTopAppBar
-import com.iliatokarev.pizzeriano161.presentation.dialogs.AcceptDeletionDialog
+import com.iliatokarev.pizzeriano161.presentation.compose.AcceptAcceptingDialog
+import com.iliatokarev.pizzeriano161.presentation.compose.AcceptDeletionDialog
 import com.iliatokarev.pizzeriano161.presentation.main.MainUiEvent
 import com.iliatokarev.pizzeriano161.presentation.main.MainViewModel
 import com.iliatokarev.pizzeriano161.presentation.orders.common.CompletedOrdersScreenView
@@ -35,6 +36,9 @@ fun CompletedOrdersScreen(
 
     var showDeletionDialog by rememberSaveable { mutableStateOf(false) }
     var orderIdToDelete by rememberSaveable { mutableStateOf<String?>(null) }
+
+    var orderIdToChangeCompletedState by rememberSaveable { mutableStateOf<String?>(null) }
+    var showChangeCompletedStateDialog by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(uiState) {
         if (uiState.isDeleteOrderError || uiState.isMarkOrderAsNewError) {
@@ -64,10 +68,9 @@ fun CompletedOrdersScreen(
             onReloadCompletedOrdersClicked = {
                 completedOrdersViewModel.setEvent(CompletedOrdersUiEvent.LoadCompletedOrders)
             },
-            onOrderChangeCompletedState = { orderData ->
-                completedOrdersViewModel.setEvent(
-                    CompletedOrdersUiEvent.MarkOrderAsNew(orderData)
-                )
+            onOrderChangeCompletedState = { orderId ->
+                orderIdToChangeCompletedState = orderId
+                showChangeCompletedStateDialog = true
             },
             onDeleteOrderClicked = { orderId ->
                 orderIdToDelete = orderId
@@ -90,6 +93,25 @@ fun CompletedOrdersScreen(
                         orderIdToDelete = null
                     },
                     infoText = stringResource(R.string.delete_this_order),
+                )
+            }
+        }
+
+        if (showChangeCompletedStateDialog){
+            orderIdToChangeCompletedState?.let { id ->
+                AcceptAcceptingDialog(
+                    onDismissRequest = {
+                        showChangeCompletedStateDialog = false
+                        orderIdToChangeCompletedState = null
+                    },
+                    onAcceptClicked = {
+                        completedOrdersViewModel.setEvent(
+                            CompletedOrdersUiEvent.MarkOrderAsNew(orderId = id)
+                        )
+                        showChangeCompletedStateDialog = false
+                        orderIdToChangeCompletedState = null
+                    },
+                    infoText = stringResource(R.string.mark_order_as_new_dialog)
                 )
             }
         }

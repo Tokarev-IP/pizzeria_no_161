@@ -40,10 +40,36 @@ class UncompletedOrdersViewModel(
             }
 
             is UncompletedOrdersUiEvent.MarkOrdersAsCompleted -> {
-                markOrdersAsCompleted(
-                    orderData = event.orderData,
-                    orderDataList = uncompletedOrdersList.value,
-                )
+                val orderData = uncompletedOrdersList.value.find { it.id == event.orderId }
+                if (orderData != null) {
+                    markOrdersAsCompleted(
+                        orderData = orderData,
+                        orderDataList = uncompletedOrdersList.value,
+                    )
+                } else
+                    setUiState(UncompletedOrdersUiState(isError = true))
+            }
+
+            is UncompletedOrdersUiEvent.MarkOrderAsConfirmed -> {
+                val orderData = uncompletedOrdersList.value.find { it.id == event.orderId }
+                if (orderData != null) {
+                    markOrderAsConfirmed(
+                        orderData = orderData,
+                        orderDataList = uncompletedOrdersList.value,
+                    )
+                } else
+                    setUiState(UncompletedOrdersUiState(isError = true))
+            }
+
+            is UncompletedOrdersUiEvent.MarkOrderAsRejected -> {
+                val orderData = uncompletedOrdersList.value.find { it.id == event.orderId }
+                if (orderData != null) {
+                    markOrderAsRejected(
+                        orderData = orderData,
+                        orderDataList = uncompletedOrdersList.value,
+                        rejectionReason = event.rejectedReason,
+                    )
+                }
             }
         }
     }
@@ -101,7 +127,54 @@ class UncompletedOrdersViewModel(
                     }
 
                     is OrderDataResponse.OrderDataError -> {
-                        setUiState(UncompletedOrdersUiState(isMarkAsCompletedError = true))
+                        setUiState(UncompletedOrdersUiState(isError = true))
+                    }
+                }
+            }
+        }
+    }
+
+    private fun markOrderAsConfirmed(orderData: OrderData, orderDataList: List<OrderData>) {
+        viewModelScope.launch {
+            setUiState(UncompletedOrdersUiState(isLoading = true))
+            ordersUseCase.updateOrderAsConfirmed(
+                orderData = orderData,
+                orderDataList = orderDataList,
+            ).apply {
+                when (this) {
+                    is OrderDataResponse.OrderDataSuccess -> {
+                        setUncompletedOrdersList(this.orderDataList)
+                        setUiState(UncompletedOrdersUiState())
+                    }
+
+                    is OrderDataResponse.OrderDataError -> {
+                        setUiState(UncompletedOrdersUiState(isError = true))
+                    }
+                }
+            }
+        }
+    }
+
+    private fun markOrderAsRejected(
+        orderData: OrderData,
+        orderDataList: List<OrderData>,
+        rejectionReason: String,
+    ) {
+        viewModelScope.launch {
+            setUiState(UncompletedOrdersUiState(isLoading = true))
+            ordersUseCase.updateOrderAsRejected(
+                orderData = orderData,
+                orderDataList = orderDataList,
+                rejectionReason = rejectionReason,
+            ).apply {
+                when (this) {
+                    is OrderDataResponse.OrderDataSuccess -> {
+                        setUncompletedOrdersList(this.orderDataList)
+                        setUiState(UncompletedOrdersUiState())
+                    }
+
+                    is OrderDataResponse.OrderDataError -> {
+                        setUiState(UncompletedOrdersUiState(isError = true))
                     }
                 }
             }
@@ -113,14 +186,17 @@ class UncompletedOrdersUiState(
     val isInitialLoading: Boolean = false,
     val isLoading: Boolean = false,
     val isLoadingOrdersError: Boolean = false,
-    val isMarkAsCompletedError: Boolean = false,
+    val isError: Boolean = false,
     val isDeleteOrderError: Boolean = false,
 ) : BasicUiState
 
 sealed interface UncompletedOrdersUiEvent : BasicUiEvent {
     object LoadUncompletedOrders : UncompletedOrdersUiEvent
-    class MarkOrdersAsCompleted(val orderData: OrderData) : UncompletedOrdersUiEvent
+    class MarkOrdersAsCompleted(val orderId: String) : UncompletedOrdersUiEvent
     class DeleteOrder(val orderId: String) : UncompletedOrdersUiEvent
+    class MarkOrderAsConfirmed(val orderId: String) : UncompletedOrdersUiEvent
+    class MarkOrderAsRejected(val orderId: String, val rejectedReason: String) :
+        UncompletedOrdersUiEvent
 }
 
 interface UncompletedOrdersUiIntent : BasicUiIntent

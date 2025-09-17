@@ -33,10 +33,14 @@ class CompletedOrdersViewModel(
             }
 
             is CompletedOrdersUiEvent.MarkOrderAsNew -> {
-                markOrderAsNew(
-                    orderData = event.orderData,
-                    orderDataList = completedOrdersList.value,
-                )
+                val orderData = completedOrdersList.value.find { it.id == event.orderId }
+                if (orderData != null)
+                    markOrderAsNew(
+                        orderData = orderData,
+                        orderDataList = completedOrdersList.value,
+                    )
+                else
+                    setUiState(CompletedOrdersUiState(isMarkOrderAsNewError = true))
             }
 
             is CompletedOrdersUiEvent.DeleteOrder -> {
@@ -119,7 +123,7 @@ class CompletedOrdersUiState(
 
 sealed interface CompletedOrdersUiEvent : BasicUiEvent {
     object LoadCompletedOrders : CompletedOrdersUiEvent
-    class MarkOrderAsNew(val orderData: OrderData) : CompletedOrdersUiEvent
+    class MarkOrderAsNew(val orderId: String) : CompletedOrdersUiEvent
     class DeleteOrder(val orderId: String) : CompletedOrdersUiEvent
 }
 
