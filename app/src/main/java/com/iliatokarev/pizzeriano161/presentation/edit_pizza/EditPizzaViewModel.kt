@@ -18,7 +18,6 @@ class EditPizzaViewModel(
 ) : BasicViewModel<EditPizzaUiState, EditPizzaUiEvent, EditPizzaUiIntent>(
     initialUiState = EditPizzaUiState(isInitialLoading = true)
 ) {
-
     private val pizzaDataVM = MutableStateFlow<PizzaData?>(null)
     private val pizzaDataFlow = pizzaDataVM.asStateFlow()
 
@@ -81,7 +80,6 @@ class EditPizzaViewModel(
                     }
                 }
             }
-
     }
 
     private fun savePizzaData(pizzaData: PizzaData) {

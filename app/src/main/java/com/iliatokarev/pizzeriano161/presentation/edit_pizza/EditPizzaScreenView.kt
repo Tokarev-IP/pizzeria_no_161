@@ -19,7 +19,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,7 +51,7 @@ import com.iliatokarev.pizzeriano161.R
 import com.iliatokarev.pizzeriano161.basic.ActionErrorView
 import com.iliatokarev.pizzeriano161.basic.shimmerBrush
 import com.iliatokarev.pizzeriano161.domain.pizza.PizzaData
-import com.iliatokarev.pizzeriano161.domain.pizza.PizzaDataPreviewEmptyPhoto
+import com.iliatokarev.pizzeriano161.domain.pizza.pizzaDataPreviewEmptyPhoto
 
 @Composable
 fun EditPizzaScreenView(
@@ -71,9 +70,9 @@ fun EditPizzaScreenView(
             ActionErrorView { onTryAgainClicked() }
         else {
             pizzaData?.let {
-                if (uiState.isLoading)
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-
+                AnimatedVisibility(uiState.isLoading) {
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                }
                 EditPizzaView(
                     pizzaData = it,
                     onClearImageClicked = { onClearImageClicked() },
@@ -384,6 +383,6 @@ private fun ShimmedView(
 @Preview(showBackground = true)
 private fun EditPizzaViewPreview() {
     EditPizzaView(
-        pizzaData = PizzaDataPreviewEmptyPhoto
+        pizzaData = pizzaDataPreviewEmptyPhoto
     )
 }
