@@ -1,5 +1,7 @@
 package com.iliatokarev.pizzeriano161.presentation.all_pizza
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,9 +34,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,7 +49,7 @@ import com.iliatokarev.pizzeriano161.R
 import com.iliatokarev.pizzeriano161.basic.ActionErrorView
 import com.iliatokarev.pizzeriano161.basic.shimmerBrush
 import com.iliatokarev.pizzeriano161.domain.pizza.PizzaData
-import com.iliatokarev.pizzeriano161.domain.pizza.PizzaDataListPreview
+import com.iliatokarev.pizzeriano161.domain.pizza.pizzaDataListPreview
 
 @Composable
 fun AllPizzaScreenView(
@@ -56,27 +60,36 @@ fun AllPizzaScreenView(
     onAddPizzaItemClick: () -> Unit,
     onDeletePizzaClicked: (pizzaId: String) -> Unit,
     onTryAgainClicked: () -> Unit,
+    onMarkPizzaAsAvailable: (pizzaId: String) -> Unit,
+    onMarkPizzaAsUnavailable: (pizzaId: String) -> Unit,
 ) {
-    Box(modifier = modifier) {
+    Box(modifier = modifier.fillMaxSize()) {
         if (uiState.isInitialLoading) {
             ShimmedView()
-        }
-        else if (uiState.isDownloadError) {
+        } else if (uiState.isDownloadError) {
             ActionErrorView { onTryAgainClicked() }
         } else {
-            if (uiState.isLoading)
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-
-            AllPizzaView(
-                pizzaDataList = pizzaDataList,
-                onPizzaItemClicked = { pizzaId ->
-                    onPizzaItemClicked(pizzaId)
-                },
-                onAddPizzaItemClick = { onAddPizzaItemClick() },
-                onDeletePizzaClicked = { pizzaId ->
-                    onDeletePizzaClicked(pizzaId)
+            Column {
+                AnimatedVisibility(uiState.isLoading) {
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                 }
-            )
+                AllPizzaView(
+                    pizzaDataList = pizzaDataList,
+                    onPizzaItemClicked = { pizzaId ->
+                        onPizzaItemClicked(pizzaId)
+                    },
+                    onAddPizzaItemClick = { onAddPizzaItemClick() },
+                    onDeletePizzaClicked = { pizzaId ->
+                        onDeletePizzaClicked(pizzaId)
+                    },
+                    onChangeAvailableState = { pizzaData ->
+                        if (pizzaData.isAvailable)
+                            onMarkPizzaAsUnavailable(pizzaData.id)
+                        else
+                            onMarkPizzaAsAvailable(pizzaData.id)
+                    },
+                )
+            }
         }
     }
 }
@@ -89,6 +102,7 @@ private fun AllPizzaView(
     onAddPizzaItemClick: () -> Unit = {},
     onDeletePizzaClicked: (pizzaId: String) -> Unit = {},
     isLoadingState: Boolean = false,
+    onChangeAvailableState: (PizzaData) -> Unit = {},
 ) {
     LazyColumn(
         modifier = modifier
@@ -105,6 +119,9 @@ private fun AllPizzaView(
                     onDeletePizzaClicked(pizzaId)
                 },
                 isLoadingState = isLoadingState,
+                onChangeAvailableState = { pizzaData ->
+                    onChangeAvailableState(pizzaData)
+                },
             )
         }
         item {
@@ -124,6 +141,7 @@ private fun PizzaItemView(
     onClick: (pizzaId: String) -> Unit,
     onDeletePizzaClicked: (pizzaId: String) -> Unit,
     isLoadingState: Boolean,
+    onChangeAvailableState: (pizzaData: PizzaData) -> Unit,
 ) {
     val uri =
         if (pizzaData.photoUriFirebase == null) pizzaData.photoUri else pizzaData.photoUriFirebase.toUri()
@@ -140,13 +158,40 @@ private fun PizzaItemView(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
         ) {
-            PizzaSubmenuBox(
-                modifier = modifier.align(Alignment.End),
-                onDeletePizzaClicked = {
-                    onDeletePizzaClicked(pizzaData.id)
-                },
-                isLoadingState = isLoadingState,
-            )
+            Row(
+                modifier = modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                AnimatedContent(
+                    targetState = pizzaData.isAvailable,
+                ) { isAvailable ->
+                    if (isAvailable)
+                        Text(
+                            text = stringResource(R.string.available),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = Color.Green,
+                        )
+                    else
+                        Text(
+                            text = stringResource(R.string.unavailable),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = Color.Red,
+                        )
+                }
+                PizzaSubmenuBox(
+                    onDeletePizzaClicked = {
+                        onDeletePizzaClicked(pizzaData.id)
+                    },
+                    isLoadingState = isLoadingState,
+                    isAvailable = pizzaData.isAvailable,
+                    onChangeAvailableState = {
+                        onChangeAvailableState(pizzaData)
+                    },
+                )
+            }
             Row(
                 modifier = modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -154,14 +199,15 @@ private fun PizzaItemView(
             ) {
                 AsyncImage(
                     modifier = modifier
-                        .width(120.dp)
-                        .height(120.dp)
+                        .width(180.dp)
+                        .height(100.dp)
                         .clip(RoundedCornerShape(12.dp)),
                     model = uri,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                 )
                 Column(
+                    modifier = modifier.padding(start = 8.dp),
                     verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.End,
                 ) {
@@ -215,7 +261,9 @@ private fun AddPizzaItemView(
 private fun PizzaSubmenuBox(
     modifier: Modifier = Modifier,
     onDeletePizzaClicked: () -> Unit,
+    onChangeAvailableState: () -> Unit,
     isLoadingState: Boolean,
+    isAvailable: Boolean,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 
@@ -248,6 +296,18 @@ private fun PizzaSubmenuBox(
                     )
                 }
             )
+            DropdownMenuItem(
+                text = {
+                    if (isAvailable)
+                        Text(text = stringResource(R.string.mark_pizza_as_unavailable))
+                    else
+                        Text(text = stringResource(R.string.mark_pizza_as_available))
+                },
+                onClick = {
+                    expanded = false
+                    onChangeAvailableState()
+                },
+            )
         }
     }
 }
@@ -279,6 +339,6 @@ private fun ShimmedView(
 @Preview(showBackground = true)
 private fun AllPizzaViewPreview() {
     AllPizzaView(
-        pizzaDataList = PizzaDataListPreview
+        pizzaDataList = pizzaDataListPreview
     )
 }

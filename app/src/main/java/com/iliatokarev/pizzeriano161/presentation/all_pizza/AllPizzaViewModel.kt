@@ -34,6 +34,14 @@ class AllPizzaViewModel(
             is AllPizzaUiEvent.DeletePizza -> {
                 deletePizzaData(event.pizzaId, allPizzaDataList.value)
             }
+
+            is AllPizzaUiEvent.ChangeAvailableState -> {
+                val pizzaData = allPizzaDataList.value.find { it.id == event.pizzaId }
+                if (pizzaData != null)
+                    changeAvailableState(pizzaData, allPizzaDataList.value)
+                else
+                    setUiState(AllPizzaUiState(isError = true))
+            }
         }
     }
 
@@ -67,10 +75,31 @@ class AllPizzaViewModel(
                         }
 
                         is AllPizzaDataListResponse.Failed -> {
-                            setUiState(AllPizzaUiState(isDeleteError = true))
+                            setUiState(AllPizzaUiState(isError = true))
                         }
                     }
                 }
+        }
+    }
+
+    private fun changeAvailableState(pizzaData: PizzaData, pizzaDataList: List<PizzaData>) {
+        viewModelScope.launch {
+            setUiState(AllPizzaUiState(isLoading = true))
+            allPizzaUseCase.changeAvailableStatePizzaData(
+                pizzaData = pizzaData,
+                pizzaDataList = pizzaDataList,
+            ).apply {
+                when (this) {
+                    is AllPizzaDataListResponse.AllPizzaDataList -> {
+                        setAllPizzaDataList(this.pizzaDataList)
+                        setUiState(AllPizzaUiState())
+                    }
+
+                    is AllPizzaDataListResponse.Failed -> {
+                        setUiState(AllPizzaUiState(isError = true))
+                    }
+                }
+            }
         }
     }
 }
@@ -79,12 +108,13 @@ class AllPizzaUiState(
     val isInitialLoading: Boolean = false,
     val isLoading: Boolean = false,
     val isDownloadError: Boolean = false,
-    val isDeleteError: Boolean = false,
+    val isError: Boolean = false,
 ) : BasicUiState
 
 sealed interface AllPizzaUiEvent : BasicUiEvent {
     object DownloadAllPizza : AllPizzaUiEvent
     class DeletePizza(val pizzaId: String) : AllPizzaUiEvent
+    class ChangeAvailableState(val pizzaId: String) : AllPizzaUiEvent
 }
 
 interface AllPizzaUiIntent : BasicUiIntent {}

@@ -17,7 +17,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.iliatokarev.pizzeriano161.R
 import com.iliatokarev.pizzeriano161.basic.BasicTopAppBar
-import com.iliatokarev.pizzeriano161.presentation.dialogs.AcceptDeletionDialog
+import com.iliatokarev.pizzeriano161.presentation.compose.AcceptAcceptingDialog
+import com.iliatokarev.pizzeriano161.presentation.compose.AcceptDeletionDialog
 import com.iliatokarev.pizzeriano161.presentation.main.MainUiEvent
 import com.iliatokarev.pizzeriano161.presentation.main.MainViewModel
 
@@ -34,8 +35,12 @@ fun AllPizzaScreen(
     var pizzaIdToDelete by rememberSaveable { mutableStateOf<String?>(null) }
     var showDialogToDeletePizza by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(key1 = uiState.isDeleteError) {
-        if (uiState.isDeleteError)
+    var pizzaIdToChangeAvailableState by rememberSaveable { mutableStateOf<String?>(null) }
+    var showDialogToMarkPizzaUnavailable by rememberSaveable { mutableStateOf(false) }
+    var showDialogToMarkPizzaAvailable by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = uiState.isError) {
+        if (uiState.isError)
             Toast.makeText(
                 localContext,
                 R.string.error,
@@ -67,7 +72,15 @@ fun AllPizzaScreen(
             },
             onTryAgainClicked = {
                 allPizzaViewModel.setEvent(AllPizzaUiEvent.DownloadAllPizza)
-            }
+            },
+            onMarkPizzaAsAvailable = { pizzaId ->
+                pizzaIdToChangeAvailableState = pizzaId
+                showDialogToMarkPizzaAvailable = true
+            },
+            onMarkPizzaAsUnavailable = { pizzaId ->
+                pizzaIdToChangeAvailableState = pizzaId
+                showDialogToMarkPizzaUnavailable = true
+            },
         )
     }
 
@@ -84,6 +97,44 @@ fun AllPizzaScreen(
                     showDialogToDeletePizza = false
                 },
                 infoText = stringResource(R.string.delete_this_pizza)
+            )
+        }
+    }
+
+    if (showDialogToMarkPizzaUnavailable) {
+        pizzaIdToChangeAvailableState?.let { id ->
+            AcceptAcceptingDialog(
+                onDismissRequest = {
+                    pizzaIdToChangeAvailableState = null
+                    showDialogToMarkPizzaUnavailable = false
+                },
+                onAcceptClicked = {
+                    allPizzaViewModel.setEvent(
+                        AllPizzaUiEvent.ChangeAvailableState(pizzaId = id)
+                    )
+                    pizzaIdToChangeAvailableState = null
+                    showDialogToMarkPizzaUnavailable = false
+                },
+                infoText = stringResource(R.string.mark_pizza_as_unavailable_dialog_text),
+            )
+        }
+    }
+
+    if (showDialogToMarkPizzaAvailable) {
+        pizzaIdToChangeAvailableState?.let { id ->
+            AcceptAcceptingDialog(
+                onDismissRequest = {
+                    pizzaIdToChangeAvailableState = null
+                    showDialogToMarkPizzaAvailable = false
+                },
+                onAcceptClicked = {
+                    allPizzaViewModel.setEvent(
+                        AllPizzaUiEvent.ChangeAvailableState(pizzaId = id)
+                    )
+                    pizzaIdToChangeAvailableState = null
+                    showDialogToMarkPizzaAvailable = false
+                },
+                infoText = stringResource(R.string.mark_pizza_as_available_dialog_text),
             )
         }
     }

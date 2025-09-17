@@ -35,12 +35,41 @@ class AllPizzaUseCase(
         }
     }
 
+    override suspend fun changeAvailableStatePizzaData(
+        pizzaData: PizzaData,
+        pizzaDataList: List<PizzaData>
+    ): AllPizzaDataListResponse {
+        return withContext(Dispatchers.IO){
+            runCatching {
+                val newPizzaData = pizzaData.copy(isAvailable = !pizzaData.isAvailable)
+                pizzaDataUseCase.uploadPizzaData(newPizzaData)
+                pizzaDataList.map {
+                    if (it.id == pizzaData.id)
+                        newPizzaData
+                    else
+                        it
+                }
+            }.fold(
+                onSuccess = { data: List<PizzaData> ->
+                    AllPizzaDataListResponse.AllPizzaDataList(data)
+                },
+                onFailure = {
+                    AllPizzaDataListResponse.Failed
+                }
+            )
+        }
+    }
 }
 
 interface AllPizzaUseCaseInterface {
     suspend fun getAllPizzaDataList(): AllPizzaDataListResponse
     suspend fun deletePizzaData(
         pizzaId: String,
+        pizzaDataList: List<PizzaData>
+    ): AllPizzaDataListResponse
+
+    suspend fun changeAvailableStatePizzaData(
+        pizzaData: PizzaData,
         pizzaDataList: List<PizzaData>
     ): AllPizzaDataListResponse
 }
