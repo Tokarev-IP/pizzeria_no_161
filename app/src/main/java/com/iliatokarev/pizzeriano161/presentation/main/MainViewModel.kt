@@ -4,6 +4,7 @@ import com.iliatokarev.pizzeriano161.basic.BasicUiEvent
 import com.iliatokarev.pizzeriano161.basic.BasicUiIntent
 import com.iliatokarev.pizzeriano161.basic.BasicUiState
 import com.iliatokarev.pizzeriano161.basic.BasicViewModel
+import com.iliatokarev.pizzeriano161.presentation.main.MainUiIntent.*
 
 class MainViewModel(
 ) : BasicViewModel<MainUiState, MainUiEvent, MainUiIntent>(MainUiState.State()) {
@@ -11,23 +12,27 @@ class MainViewModel(
     override fun setEvent(event: MainUiEvent) {
         when (event) {
             is MainUiEvent.GoToAllPizzaScreen -> {
-                setIntent(MainUiIntent.GoToAllPizzaScreenIntent)
+                setIntent(GoToAllPizzaScreenIntent)
             }
 
             is MainUiEvent.GoToCompletedOrdersScreen -> {
-                setIntent(MainUiIntent.GoToCompletedOrdersScreenIntent)
+                setIntent(GoToCompletedOrdersScreenIntent)
             }
 
             is MainUiEvent.GoToNewOrdersScreen -> {
-                setIntent(MainUiIntent.GoToNewOrdersScreenIntent)
+                setIntent(GoToNewOrdersScreenIntent)
             }
 
             is MainUiEvent.GoBack -> {
-                setIntent(MainUiIntent.GoBackIntent)
+                setIntent(GoBackIntent)
             }
 
             is MainUiEvent.GoToEditPizzaScreen -> {
-                setIntent(MainUiIntent.GoToEditPizzaScreen(event.pizzaId))
+                setIntent(GoToEditPizzaScreen(event.pizzaId))
+            }
+
+            is MainUiEvent.GoToEditOrderScreen -> {
+                setIntent(GoToEditOrderScreen(event.orderId))
             }
         }
     }
@@ -47,6 +52,7 @@ sealed interface MainUiEvent : BasicUiEvent {
     object GoToCompletedOrdersScreen : MainUiEvent
     object GoBack : MainUiEvent
     class GoToEditPizzaScreen(val pizzaId: String?) : MainUiEvent
+    class GoToEditOrderScreen(val orderId: String) : MainUiEvent
 }
 
 sealed interface MainUiIntent : BasicUiIntent {
@@ -55,4 +61,5 @@ sealed interface MainUiIntent : BasicUiIntent {
     object GoToCompletedOrdersScreenIntent : MainUiIntent
     object GoBackIntent : MainUiIntent
     class GoToEditPizzaScreen(val pizzaId: String?) : MainUiIntent
+    class GoToEditOrderScreen(val orderId: String) : MainUiIntent
 }

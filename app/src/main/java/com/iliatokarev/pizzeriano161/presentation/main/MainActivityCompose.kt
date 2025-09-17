@@ -10,6 +10,9 @@ import androidx.navigation3.ui.NavDisplay
 import com.iliatokarev.pizzeriano161.presentation.all_pizza.AllPizzaScreen
 import com.iliatokarev.pizzeriano161.presentation.all_pizza.AllPizzaUiEvent
 import com.iliatokarev.pizzeriano161.presentation.all_pizza.AllPizzaViewModel
+import com.iliatokarev.pizzeriano161.presentation.edit_order.EditOrderScreen
+import com.iliatokarev.pizzeriano161.presentation.edit_order.EditOrderUiEvent
+import com.iliatokarev.pizzeriano161.presentation.edit_order.EditOrderViewModel
 import com.iliatokarev.pizzeriano161.presentation.edit_pizza.EditPizzaScreen
 import com.iliatokarev.pizzeriano161.presentation.edit_pizza.EditPizzaUiEvent
 import com.iliatokarev.pizzeriano161.presentation.edit_pizza.EditPizzaViewModel
@@ -53,6 +56,10 @@ fun MainActivityCompose(
                 is MainUiIntent.GoToEditPizzaScreen -> {
                     backStack.add(ScreensNavigation.EditPizzaScreenNav(intent.pizzaId))
                 }
+
+                is MainUiIntent.GoToEditOrderScreen -> {
+                    backStack.add(ScreensNavigation.EditOrderScreenNav(intent.orderId))
+                }
             }
         }
     }
@@ -63,7 +70,7 @@ fun MainActivityCompose(
         entryProvider = entryProvider {
             entry<ScreensNavigation.ManagerScreenNav> {
                 val managerViewModel: ManagerViewModel = koinViewModel()
-                managerViewModel.setEvent(ManagerUiEvent.DoAuthUser)
+                managerViewModel.setEvent(ManagerUiEvent.DoUserAuth)
 
                 ManagerScreen(
                     mainViewModel = mainViewModel,
@@ -111,6 +118,17 @@ fun MainActivityCompose(
                     pizzaId = key.pizzaId,
                 )
             }
+
+            entry<ScreensNavigation.EditOrderScreenNav> { key ->
+                val editOrderViewModel: EditOrderViewModel = koinViewModel()
+                editOrderViewModel.setEvent(EditOrderUiEvent.DownloadAllData(orderId = key.orderId))
+
+                EditOrderScreen(
+                    mainViewModel = mainViewModel,
+                    editOrderViewModel = editOrderViewModel,
+                    orderId = key.orderId,
+                )
+            }
         },
     )
 }
@@ -130,4 +148,7 @@ sealed interface ScreensNavigation : NavKey {
 
     @Serializable
     class EditPizzaScreenNav(val pizzaId: String?) : ScreensNavigation
+
+    @Serializable
+    class EditOrderScreenNav(val orderId: String) : ScreensNavigation
 }

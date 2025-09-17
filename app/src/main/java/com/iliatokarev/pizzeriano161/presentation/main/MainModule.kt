@@ -3,6 +3,9 @@ package com.iliatokarev.pizzeriano161.presentation.main
 import com.iliatokarev.pizzeriano161.presentation.all_pizza.AllPizzaUseCase
 import com.iliatokarev.pizzeriano161.presentation.all_pizza.AllPizzaUseCaseInterface
 import com.iliatokarev.pizzeriano161.presentation.all_pizza.AllPizzaViewModel
+import com.iliatokarev.pizzeriano161.presentation.edit_order.EditOrderUseCase
+import com.iliatokarev.pizzeriano161.presentation.edit_order.EditOrderUseCaseInterface
+import com.iliatokarev.pizzeriano161.presentation.edit_order.EditOrderViewModel
 import com.iliatokarev.pizzeriano161.presentation.edit_pizza.EditPizzaUseCase
 import com.iliatokarev.pizzeriano161.presentation.edit_pizza.EditPizzaUseCaseInterface
 import com.iliatokarev.pizzeriano161.presentation.edit_pizza.EditPizzaViewModel
@@ -25,9 +28,11 @@ val mainModule = module {
     viewModelOf(::EditPizzaViewModel)
     viewModelOf(::MainViewModel)
     viewModelOf(::ManagerViewModel)
+    viewModelOf(::EditOrderViewModel)
 
     factoryOf(::AllPizzaUseCase) { bind<AllPizzaUseCaseInterface>() }
     factoryOf(::EditPizzaUseCase) { bind<EditPizzaUseCaseInterface>() }
     factoryOf(::ManagerUseCase) { bind<ManagerUseCaseInterface>() }
     factoryOf(::OrdersUseCase) { bind<OrdersUseCaseInterface>() }
+    factoryOf(::EditOrderUseCase) { bind<EditOrderUseCaseInterface>() }
 }
