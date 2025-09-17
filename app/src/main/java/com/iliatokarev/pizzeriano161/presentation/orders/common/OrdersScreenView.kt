@@ -1,6 +1,6 @@
 package com.iliatokarev.pizzeriano161.presentation.orders.common
 
-import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,6 +32,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -44,6 +45,7 @@ import com.iliatokarev.pizzeriano161.basic.ActionErrorView
 import com.iliatokarev.pizzeriano161.basic.shimmerBrush
 import com.iliatokarev.pizzeriano161.domain.order.OrderData
 import com.iliatokarev.pizzeriano161.domain.order.orderDataListPreview
+import com.iliatokarev.pizzeriano161.presentation.compose.FlowGridLayout
 import com.iliatokarev.pizzeriano161.presentation.orders.completed.CompletedOrdersUiState
 import com.iliatokarev.pizzeriano161.presentation.orders.uncompleted.UncompletedOrdersUiState
 
@@ -53,8 +55,11 @@ fun UncompletedOrdersScreenView(
     orderDataList: List<OrderData>,
     uiState: UncompletedOrdersUiState,
     onReloadUncompletedOrdersClicked: () -> Unit,
-    onOrderChangeCompletedState: (orderData: OrderData) -> Unit,
+    onOrderChangeCompletedState: (orderId: String) -> Unit,
     onDeleteOrderClicked: (orderId: String) -> Unit,
+    onMarkAsConfirmed: (orderId: String) -> Unit,
+    onMarkAsRejected: (orderId: String) -> Unit,
+    onEditOrderClicked: (orderData: OrderData) -> Unit,
 ) {
     Box(
         modifier = modifier.fillMaxSize(),
@@ -64,18 +69,32 @@ fun UncompletedOrdersScreenView(
         } else if (uiState.isLoadingOrdersError) {
             ActionErrorView { onReloadUncompletedOrdersClicked() }
         } else {
-            if (uiState.isLoading)
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            OrdersView(
-                orderDataList = orderDataList,
-                isLoading = uiState.isLoading,
-                onChangeCompletedState = { orderData ->
-                    onOrderChangeCompletedState(orderData)
-                },
-                onDeleteOrderClicked = { orderId ->
-                    onDeleteOrderClicked(orderId)
-                },
-            )
+            Column {
+                AnimatedVisibility(uiState.isLoading) {
+                    LinearProgressIndicator(
+                        modifier = Modifier.fillMaxWidth().shadow(elevation = 20.dp),
+                    )
+                }
+                OrdersView(
+                    orderDataList = orderDataList,
+                    isLoading = uiState.isLoading,
+                    onChangeCompletedState = { orderId ->
+                        onOrderChangeCompletedState(orderId)
+                    },
+                    onDeleteOrderClicked = { orderId ->
+                        onDeleteOrderClicked(orderId)
+                    },
+                    onMarkAsConfirmed = { orderId ->
+                        onMarkAsConfirmed(orderId)
+                    },
+                    onMarkAsRejected = { orderId ->
+                        onMarkAsRejected(orderId)
+                    },
+                    onEditOrderClicked = { orderData ->
+                        onEditOrderClicked(orderData)
+                    },
+                )
+            }
         }
     }
 }
@@ -86,7 +105,7 @@ fun CompletedOrdersScreenView(
     orderDataList: List<OrderData>,
     uiState: CompletedOrdersUiState,
     onReloadCompletedOrdersClicked: () -> Unit,
-    onOrderChangeCompletedState: (orderData: OrderData) -> Unit,
+    onOrderChangeCompletedState: (orderId: String) -> Unit,
     onDeleteOrderClicked: (orderId: String) -> Unit,
 ) {
     Box(
@@ -97,18 +116,23 @@ fun CompletedOrdersScreenView(
         } else if (uiState.isLoadingOrdersError) {
             ActionErrorView { onReloadCompletedOrdersClicked() }
         } else {
-            if (uiState.isLoading)
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            OrdersView(
-                orderDataList = orderDataList,
-                isLoading = uiState.isLoading,
-                onChangeCompletedState = { orderData ->
-                    onOrderChangeCompletedState(orderData)
-                },
-                onDeleteOrderClicked = { orderId ->
-                    onDeleteOrderClicked(orderId)
-                },
-            )
+            Column {
+                AnimatedVisibility(uiState.isLoading) {
+                    LinearProgressIndicator(
+                        modifier = Modifier.fillMaxWidth().shadow(elevation = 20.dp),
+                    )
+                }
+                OrdersView(
+                    orderDataList = orderDataList,
+                    isLoading = uiState.isLoading,
+                    onChangeCompletedState = { orderData ->
+                        onOrderChangeCompletedState(orderData)
+                    },
+                    onDeleteOrderClicked = { orderId ->
+                        onDeleteOrderClicked(orderId)
+                    },
+                )
+            }
         }
     }
 }
@@ -118,8 +142,11 @@ private fun OrdersView(
     modifier: Modifier = Modifier,
     orderDataList: List<OrderData> = emptyList(),
     isLoading: Boolean = false,
-    onChangeCompletedState: (OrderData) -> Unit = {},
-    onDeleteOrderClicked: (orderId: String) -> Unit = {}
+    onChangeCompletedState: (orderId: String) -> Unit = {},
+    onDeleteOrderClicked: (orderId: String) -> Unit = {},
+    onMarkAsConfirmed: (orderId: String) -> Unit = {},
+    onMarkAsRejected: (orderId: String) -> Unit = {},
+    onEditOrderClicked: (orderData: OrderData) -> Unit = {},
 ) {
     if (orderDataList.isEmpty())
         Text(
@@ -145,7 +172,16 @@ private fun OrdersView(
                     },
                     onDeleteOrderClicked = { orderId ->
                         onDeleteOrderClicked(orderId)
-                    }
+                    },
+                    onMarkAsConfirmed = { orderId ->
+                        onMarkAsConfirmed(orderId)
+                    },
+                    onMarkAsRejected = { orderId ->
+                        onMarkAsRejected(orderId)
+                    },
+                    onEditOrderClicked = { orderData ->
+                        onEditOrderClicked(orderData)
+                    },
                 )
             }
         }
@@ -155,8 +191,11 @@ private fun OrdersView(
 private fun OrderItemView(
     modifier: Modifier = Modifier,
     orderData: OrderData,
-    onChangeCompletedState: (orderData: OrderData) -> Unit,
+    onChangeCompletedState: (orderId: String) -> Unit,
     onDeleteOrderClicked: (orderId: String) -> Unit,
+    onMarkAsConfirmed: (orderId: String) -> Unit,
+    onMarkAsRejected: (orderId: String) -> Unit,
+    onEditOrderClicked: (orderData: OrderData) -> Unit,
     isLoading: Boolean,
 ) {
     OutlinedCard(
@@ -165,29 +204,58 @@ private fun OrderItemView(
             .padding(vertical = 4.dp),
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
         ) {
-            OrderSubmenuBox(
-                modifier = modifier.align(Alignment.End),
-                onChangeCompletedState = { onChangeCompletedState(orderData) },
-                onDeleteOrderClicked = { onDeleteOrderClicked(orderData.id) },
-                isLoadingState = isLoading,
-                isCompleted = orderData.isCompleted,
-            )
             Row(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                modifier = modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                OrderItemMainInfo(
-                    modifier = modifier.weight(1F),
-                    orderData = orderData,
-                )
-                OrderItemPizzaInfo(
-                    modifier = modifier.weight(1F),
-                    orderData = orderData,
+                AnimatedVisibility(
+                    visible = !orderData.isConfirmed && !orderData.isCompleted,
+                ) {
+                    Text(
+                        text = stringResource(R.string.status_new),
+                        color = Color.Green,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
+                AnimatedVisibility(
+                    visible = !orderData.isConfirmed && orderData.isCompleted,
+                ) {
+                    Text(
+                        text = stringResource(R.string.status_rejected),
+                        color = Color.Red,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
+                AnimatedVisibility(
+                    visible = orderData.isConfirmed,
+                ) {
+                    Text(
+                        text = stringResource(R.string.status_confirmed),
+                        color = Color.Green,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
+                OrderSubmenuBox(
+                    onChangeCompletedState = { onChangeCompletedState(orderData.id) },
+                    onDeleteOrderClicked = { onDeleteOrderClicked(orderData.id) },
+                    isLoadingState = isLoading,
+                    isCompleted = orderData.isCompleted,
+                    onMarkAsConfirmed = { onMarkAsConfirmed(orderData.id) },
+                    onMarkAsRejected = { onMarkAsRejected(orderData.id) },
+                    onEditOrderClicked = { onEditOrderClicked(orderData) },
                 )
             }
+            OrderItemMainInfo(orderData = orderData)
+            Spacer(modifier = Modifier.height(16.dp))
+            OrderItemPizzaInfo(orderData = orderData)
         }
     }
 }
@@ -197,46 +265,58 @@ private fun OrderItemMainInfo(
     modifier: Modifier = Modifier,
     orderData: OrderData,
 ) {
-    Column(modifier = modifier) {
+    Column(modifier = modifier.fillMaxWidth()) {
         if (orderData.isCompleted)
             Text(
-                text = stringResource(R.string.status_completed),
-                color = Color.Green,
+                text = stringResource(R.string.completed_order),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
             )
         else
             Text(
-                text = stringResource(R.string.status_new_order),
-                color = Color.Red,
+                text = stringResource(R.string.new_order),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
             )
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         Text(
-            text = orderData.time,
+            text = stringResource(R.string.date_data, orderData.time),
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
         )
 
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = orderData.consumerName,
+            text = stringResource(R.string.name_data, orderData.consumerName),
             fontSize = 16.sp,
             fontWeight = FontWeight.Normal,
         )
 
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = orderData.consumerPhone,
+            text = stringResource(R.string.phone_data, orderData.consumerPhone),
             fontSize = 16.sp,
             fontWeight = FontWeight.Normal,
         )
 
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = orderData.additionalInfo,
+            text = stringResource(R.string.email_data, orderData.consumerEmail),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Normal,
+        )
+
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = stringResource(R.string.sum_data, orderData.sum.toString()),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Normal,
+        )
+
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = stringResource(R.string.comment_data, orderData.additionalInfo),
             fontSize = 16.sp,
             fontWeight = FontWeight.Normal,
         )
@@ -248,15 +328,13 @@ private fun OrderItemPizzaInfo(
     modifier: Modifier = Modifier,
     orderData: OrderData,
 ) {
-    Column(modifier = modifier) {
+    FlowGridLayout {
         for (pizza in orderData.pizzaList) {
-            ElevatedCard(
-                modifier = Modifier.padding(vertical = 4.dp, horizontal = 4.dp),
-            ) {
+            ElevatedCard {
                 Text(
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                    modifier = modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                     text = pizza,
-                    fontSize = 16.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Medium,
                 )
             }
@@ -269,6 +347,9 @@ private fun OrderSubmenuBox(
     modifier: Modifier = Modifier,
     onDeleteOrderClicked: () -> Unit,
     onChangeCompletedState: () -> Unit,
+    onMarkAsConfirmed: () -> Unit,
+    onMarkAsRejected: () -> Unit,
+    onEditOrderClicked: () -> Unit,
     isLoadingState: Boolean,
     isCompleted: Boolean,
 ) {
@@ -303,28 +384,54 @@ private fun OrderSubmenuBox(
                     )
                 }
             )
+            if (!isCompleted)
+                DropdownMenuItem(
+                    text = {
+                        Text(text = stringResource(R.string.edit))
+                    },
+                    onClick = {
+                        expanded = false
+                        onEditOrderClicked()
+                    },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Outlined.Edit,
+                            contentDescription = null
+                        )
+                    }
+                )
             DropdownMenuItem(
                 text = {
-                    AnimatedContent(
-                        targetState = isCompleted,
-                    ) { isOrderCompleted ->
-                        if (isOrderCompleted)
-                            Text(text = stringResource(R.string.mark_as_new_order))
-                        else
-                            Text(text = stringResource(R.string.mark_as_completed_order))
-                    }
+                    if (isCompleted)
+                        Text(text = stringResource(R.string.mark_as_new_order))
+                    else
+                        Text(text = stringResource(R.string.mark_as_completed_order))
                 },
                 onClick = {
                     expanded = false
                     onChangeCompletedState()
                 },
-                leadingIcon = {
-                    Icon(
-                        Icons.Outlined.Edit,
-                        contentDescription = null
-                    )
-                }
             )
+            if (!isCompleted) {
+                DropdownMenuItem(
+                    text = {
+                        Text(text = stringResource(R.string.mark_order_as_confirmed))
+                    },
+                    onClick = {
+                        expanded = false
+                        onMarkAsConfirmed()
+                    },
+                )
+                DropdownMenuItem(
+                    text = {
+                        Text(text = stringResource(R.string.mark_order_as_rejected))
+                    },
+                    onClick = {
+                        expanded = false
+                        onMarkAsRejected()
+                    },
+                )
+            }
         }
     }
 }

@@ -21,6 +21,14 @@ class OrderDataUseCase(
         }
     }
 
+    override suspend fun getOrderDataById(orderId: String): OrderData? {
+        firebaseFirestoreOrder.downloadOrderData(
+            documentName = orderId
+        ).apply {
+            return this?.toOrderData()
+        }
+    }
+
     override suspend fun uploadOrderData(orderData: OrderData) {
         withTimeout(TIMEOUT_TIME) {
             delay(SHORT_DELAY)
@@ -44,6 +52,7 @@ class OrderDataUseCase(
 interface OrderDataUseCaseInterface {
     suspend fun getCompletedOrderDataList(): List<OrderData>
     suspend fun getNewOrderDataList(): List<OrderData>
+    suspend fun getOrderDataById(orderId: String): OrderData?
     suspend fun uploadOrderData(orderData: OrderData)
     suspend fun deleteOrderData(orderId: String)
 }

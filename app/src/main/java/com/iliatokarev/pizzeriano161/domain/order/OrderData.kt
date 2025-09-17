@@ -6,6 +6,7 @@ import com.iliatokarev.pizzeriano161.data.FirebaseOrderData
 data class OrderData(
     val id: String,
     val isCompleted: Boolean,
+    val isConfirmed: Boolean,
     val sum: Float,
     val consumerName: String,
     val consumerPhone: String,
@@ -13,11 +14,14 @@ data class OrderData(
     val pizzaList: List<String>,
     val additionalInfo: String,
     val time: String,
+    val timeHour: String,
+    val timeDay: String,
 )
 
 fun OrderData.toFirebaseOrderData() = FirebaseOrderData(
     id = id,
     completed = isCompleted,
+    confirmed = isConfirmed,
     sum = sum,
     consumerName = consumerName,
     consumerEmail = consumerEmail,
@@ -30,6 +34,7 @@ fun OrderData.toFirebaseOrderData() = FirebaseOrderData(
 val orderDataPreview = OrderData(
     id = "1234",
     isCompleted = true,
+    isConfirmed = false,
     sum = 5348F,
     consumerName = "Vasy",
     consumerEmail = "dconsumer@email.com",
@@ -37,12 +42,15 @@ val orderDataPreview = OrderData(
     pizzaList = listOf("4formagio", "salami", "classico pizzerio", "margarita"),
     additionalInfo = "good pizza for me",
     time = "14-42 25-09-2025",
+    timeHour = "14:42",
+    timeDay = "25-09-2025",
 )
 
 val orderDataListPreview = listOf(
     OrderData(
         id = "1234",
         isCompleted = true,
+        isConfirmed = false,
         sum = 5348F,
         consumerName = "Vasy",
         consumerEmail = "dconsumer@email.com",
@@ -50,10 +58,13 @@ val orderDataListPreview = listOf(
         pizzaList = listOf("4formagio", "salami", "classico pizzerio", "margarita"),
         additionalInfo = "good pizza for me",
         time = "14-42 25-09-2025",
+        timeHour = "14:42",
+        timeDay = "25-09-2025",
     ),
     OrderData(
         id = "8456",
         isCompleted = true,
+        isConfirmed = false,
         sum = 5348F,
         consumerName = "Vasy",
         consumerEmail = "dconsumer@email.com",
@@ -61,10 +72,13 @@ val orderDataListPreview = listOf(
         pizzaList = listOf("4formagio", "salami", "classico pizzerio", "margarita"),
         additionalInfo = "good pizza for me",
         time = "14-42 25-09-2025",
+        timeHour = "14:42",
+        timeDay = "25-09-2025",
     ),
     OrderData(
         id = "87934",
         isCompleted = false,
+        isConfirmed = true,
         sum = 5348F,
         consumerName = "Vasy",
         consumerEmail = "dconsumer@email.com",
@@ -72,10 +86,13 @@ val orderDataListPreview = listOf(
         pizzaList = listOf("4formagio", "salami", "classico pizzerio", "margarita"),
         additionalInfo = "good pizza for me",
         time = "14-42 25-09-2025",
+        timeHour = "14:42",
+        timeDay = "25-09-2025",
     ),
     OrderData(
         id = "2358",
         isCompleted = true,
+        isConfirmed = true,
         sum = 5348F,
         consumerName = "Vasy",
         consumerEmail = "dconsumer@email.com",
@@ -83,10 +100,13 @@ val orderDataListPreview = listOf(
         pizzaList = listOf("4formagio", "salami", "classico pizzerio", "margarita"),
         additionalInfo = "good pizza for me",
         time = "14-42 25-09-2025",
+        timeHour = "14:42",
+        timeDay = "25-09-2025",
     ),
     OrderData(
         id = "8765",
         isCompleted = false,
+        isConfirmed = true,
         sum = 5348F,
         consumerName = "Vasy",
         consumerEmail = "dconsumer@email.com",
@@ -94,5 +114,7 @@ val orderDataListPreview = listOf(
         pizzaList = listOf("4formagio", "salami", "classico pizzerio", "margarita"),
         additionalInfo = "good pizza for me",
         time = "14-42 25-09-2025",
+        timeHour = "14:42",
+        timeDay = "25-09-2025",
     )
 )
