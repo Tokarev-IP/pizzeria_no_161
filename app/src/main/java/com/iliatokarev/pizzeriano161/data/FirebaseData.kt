@@ -12,6 +12,7 @@ class FirebasePizzaData(
     val price: Float = 0F,
     val description: String = "",
     val photoUri: String? = null,
+    val available: Boolean = true,
 )
 
 fun FirebasePizzaData.toPizzaData(): PizzaData {
@@ -22,6 +23,7 @@ fun FirebasePizzaData.toPizzaData(): PizzaData {
         description = this.description,
         photoUriFirebase = this.photoUri,
         photoUri = null,
+        isAvailable = this.available,
     )
 }
 
@@ -29,6 +31,7 @@ fun FirebasePizzaData.toPizzaData(): PizzaData {
 class FirebaseOrderData(
     val id: String = "",
     val completed: Boolean = false,
+    val confirmed: Boolean = false,
     val sum: Float = 0.0F,
     val consumerName: String = "",
     val consumerEmail: String = "",
@@ -41,6 +44,7 @@ class FirebaseOrderData(
 fun FirebaseOrderData.toOrderData() = OrderData(
     id = this.id,
     isCompleted = this.completed,
+    isConfirmed = this.confirmed,
     sum = this.sum,
     consumerName = this.consumerName,
     consumerEmail = this.consumerEmail,
@@ -48,4 +52,24 @@ fun FirebaseOrderData.toOrderData() = OrderData(
     pizzaList = this.pizzaList,
     additionalInfo = this.additionalInfo,
     time = TimeUtilsForOrder.longToString(this.time),
+    timeHour = TimeUtilsForOrder.longToHourString(this.time),
+    timeDay = TimeUtilsForOrder.longToDateString(this.time),
+)
+
+@Serializable
+class FirebaseMessageData(
+    val to: List<String> = emptyList(),
+    val message: MessageData = MessageData(),
+)
+
+@Serializable
+class MessageData(
+    val subject: String = "",
+    val text: String = "",
+    val html: String = "",
+)
+
+@Serializable
+class FirebaseMainData(
+    val open: Boolean = true,
 )
