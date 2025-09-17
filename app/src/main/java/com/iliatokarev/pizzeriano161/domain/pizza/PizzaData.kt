@@ -10,6 +10,7 @@ data class PizzaData(
     val description: String = "",
     val photoUriFirebase: String? = null,
     val photoUri: Uri? = null,
+    val isAvailable: Boolean = true,
 )
 
 fun PizzaData.toFirebasePizzaData(): FirebasePizzaData {
@@ -19,10 +20,11 @@ fun PizzaData.toFirebasePizzaData(): FirebasePizzaData {
         price = this.price,
         description = this.description,
         photoUri = this.photoUriFirebase,
+        available = this.isAvailable,
     )
 }
 
-val PizzaDataPreviewEmptyPhoto = PizzaData(
+val pizzaDataPreviewEmptyPhoto = PizzaData(
     id = "1234",
     name = "Pizza 1",
     price = 100F,
@@ -31,7 +33,7 @@ val PizzaDataPreviewEmptyPhoto = PizzaData(
     photoUri = null,
 )
 
-val PizzaDataPreviewWithPhoto = PizzaData(
+val pizzaDataPreviewWithPhoto = PizzaData(
     id = "1234",
     name = "Pizza 1",
     price = 100F,
@@ -40,7 +42,7 @@ val PizzaDataPreviewWithPhoto = PizzaData(
     photoUri = null,
 )
 
-val PizzaDataListPreview = listOf<PizzaData>(
+val pizzaDataListPreview = listOf<PizzaData>(
     PizzaData(
         id = "1234",
         name = "Pizza 1",
@@ -48,6 +50,7 @@ val PizzaDataListPreview = listOf<PizzaData>(
         description = "Pizza 1 description",
         photoUriFirebase = null,
         photoUri = null,
+        isAvailable = true,
     ),
     PizzaData(
         id = "12345",
@@ -56,6 +59,7 @@ val PizzaDataListPreview = listOf<PizzaData>(
         description = "Pizza 2 description about pizza more and more word to check it properly",
         photoUriFirebase = null,
         photoUri = null,
+        isAvailable = false,
     ),
     PizzaData(
         id = "123456",
@@ -64,6 +68,7 @@ val PizzaDataListPreview = listOf<PizzaData>(
         description = "Pizza 3 description",
         photoUriFirebase = null,
         photoUri = null,
+        isAvailable = true,
     ),
     PizzaData(
         id = "1234567",
@@ -72,6 +77,7 @@ val PizzaDataListPreview = listOf<PizzaData>(
         description = "Pizza 4 description",
         photoUriFirebase = null,
         photoUri = null,
+        isAvailable = false,
     ),
     PizzaData(
         id = "1234567",
@@ -80,5 +86,6 @@ val PizzaDataListPreview = listOf<PizzaData>(
         description = "Pizza 5 description",
         photoUriFirebase = null,
         photoUri = null,
+        isAvailable = true,
     ),
 )
