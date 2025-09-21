@@ -81,4 +81,4 @@ interface FirebaseStorageInterface {
     suspend fun deleteCompressedPhoto(name: String)
 }
 
-private const val IMAGE_SIZE = "_400x400"
+private const val IMAGE_SIZE = "_1000x1000"
