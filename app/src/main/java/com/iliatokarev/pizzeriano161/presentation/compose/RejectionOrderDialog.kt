@@ -59,7 +59,10 @@ internal fun RejectionOrderDialog(
                     onValueChange = { value ->
                         textState = value
                     },
-                    label = { Text(text = stringResource(R.string.reason_of_rejection)) }
+                    label = { Text(text = stringResource(R.string.reason_of_rejection)) },
+                    supportingText = {
+                        Text(text = stringResource(R.string.reason_of_rejection_supporting_text))
+                    }
                 )
                 Spacer(modifier = modifier.height(20.dp))
                 CancelAcceptButtonView(
