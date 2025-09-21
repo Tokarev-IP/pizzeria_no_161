@@ -45,6 +45,7 @@ class EditOrderViewModel(
                         orderData = order,
                         email = event.email,
                         comment = event.comment,
+                        sum = event.sum,
                     )
                 } ?: run {
                     setUiState(EditOrderUiState(isError = true))
@@ -108,12 +109,13 @@ class EditOrderViewModel(
         }
     }
 
-    private fun uploadOrderData(orderData: OrderData, email: String, comment: String) {
+    private fun uploadOrderData(orderData: OrderData, email: String, comment: String, sum: Float) {
         viewModelScope.launch {
             setUiState(EditOrderUiState(isLoading = true))
             val newOrderData = orderData.copy(
                 consumerEmail = email,
-                additionalInfo = comment
+                additionalInfo = comment,
+                sum = sum,
             )
             editOrderUseCase.uploadOrderData(newOrderData).apply {
                 when (this) {
@@ -185,7 +187,7 @@ class EditOrderUiState(
 ) : BasicUiState
 
 sealed interface EditOrderUiEvent : BasicUiEvent {
-    class UploadOrderData(val email: String, val comment: String) : EditOrderUiEvent
+    class UploadOrderData(val email: String, val comment: String, val sum: Float) : EditOrderUiEvent
     class DownloadAllData(val orderId: String) : EditOrderUiEvent
     class SetHour(val hour: String) : EditOrderUiEvent
     class SetDate(val date: String) : EditOrderUiEvent

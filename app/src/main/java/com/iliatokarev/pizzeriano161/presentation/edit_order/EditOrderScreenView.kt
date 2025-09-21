@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
@@ -33,14 +35,17 @@ import androidx.compose.material3.TimeInput
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -62,7 +67,7 @@ fun EditOrderScreenView(
     onTryAgainClicked: () -> Unit,
     onSetTimeHour: (timeHour: String) -> Unit,
     onSetTimeDay: (timeDay: String) -> Unit,
-    onSaveChanges: (email: String, comment: String) -> Unit,
+    onSaveChanges: (email: String, comment: String, sum: Float) -> Unit,
     onAddPizzaClicked: () -> Unit,
     onDeletePizza: (pizzaName: String) -> Unit,
 ) {
@@ -86,8 +91,8 @@ fun EditOrderScreenView(
                         onSetTimeDay = { timeDay ->
                             onSetTimeDay(timeDay)
                         },
-                        onSaveChanges = { email, comment ->
-                            onSaveChanges(email, comment)
+                        onSaveChanges = { email, comment, sum ->
+                            onSaveChanges(email, comment, sum)
                         },
                         onAddPizzaClicked = { onAddPizzaClicked() },
                         onDeletePizza = { pizzaName ->
@@ -109,7 +114,7 @@ private fun EditOrderView(
     onSetTimeHour: (timeHour: String) -> Unit = {},
     onSetTimeDay: (timeDay: String) -> Unit = {},
     onDeletePizza: (pizzaName: String) -> Unit = {},
-    onSaveChanges: (email: String, comment: String) -> Unit = { _, _ -> },
+    onSaveChanges: (email: String, comment: String, sum: Float) -> Unit = { _, _, _ -> },
     onAddPizzaClicked: () -> Unit = {},
 ) {
     var showTimePicker by rememberSaveable { mutableStateOf(false) }
@@ -130,8 +135,8 @@ private fun EditOrderView(
                 onDeletePizza = { pizzaName: String ->
                     onDeletePizza(pizzaName)
                 },
-                onSaveChanges = { email, comment ->
-                    onSaveChanges(email, comment)
+                onSaveChanges = { email, comment, sum ->
+                    onSaveChanges(email, comment, sum)
                 },
                 onAddPizzaClicked = { onAddPizzaClicked() },
             )
@@ -169,11 +174,20 @@ private fun OrderDataListView(
     onChooseTimeHourClicked: () -> Unit,
     onChooseTimeDayClicked: () -> Unit,
     onDeletePizza: (pizzaName: String) -> Unit,
-    onSaveChanges: (emailText: String, commentText: String) -> Unit,
+    onSaveChanges: (emailText: String, commentText: String, sum: Float) -> Unit,
     onAddPizzaClicked: () -> Unit,
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     var emailText by rememberSaveable { mutableStateOf(orderData.consumerEmail) }
     var commentText by rememberSaveable { mutableStateOf(orderData.additionalInfo) }
+    var sumText by rememberSaveable { mutableStateOf(orderData.sum.toString()) }
+
+    var sumTextError by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = orderData.sum) {
+        sumText = orderData.sum.toString()
+    }
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -189,13 +203,6 @@ private fun OrderDataListView(
 
         Text(
             text = stringResource(R.string.phone_data, orderData.consumerPhone),
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Normal,
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Text(
-            text = stringResource(R.string.sum_data, orderData.sum.toString()),
             fontSize = 20.sp,
             fontWeight = FontWeight.Normal,
         )
@@ -244,11 +251,32 @@ private fun OrderDataListView(
         Spacer(modifier = Modifier.height(20.dp))
 
         OutlinedTextField(
+            value = sumText,
+            onValueChange = { value ->
+                if (sumTextError)
+                    sumTextError = false
+                sumText = value
+            },
+            label = { Text(stringResource(R.string.sum)) },
+            keyboardActions = KeyboardActions(
+                onDone = { keyboardController?.hide() }
+            ),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Decimal,
+            ),
+            isError = sumTextError,
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+
+        OutlinedTextField(
             value = emailText,
             onValueChange = { value ->
                 emailText = value
             },
-            label = { Text(stringResource(R.string.email)) }
+            label = { Text(stringResource(R.string.email)) },
+            keyboardActions = KeyboardActions(
+                onDone = { keyboardController?.hide() }
+            ),
         )
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -257,7 +285,10 @@ private fun OrderDataListView(
             onValueChange = { value ->
                 commentText = value
             },
-            label = { Text(stringResource(R.string.comment)) }
+            label = { Text(stringResource(R.string.comment)) },
+            keyboardActions = KeyboardActions(
+                onDone = { keyboardController?.hide() }
+            ),
         )
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -273,7 +304,12 @@ private fun OrderDataListView(
         Spacer(modifier = Modifier.height(20.dp))
 
         OutlinedButton(
-            onClick = { onSaveChanges(emailText, commentText) },
+            onClick = {
+                val sum = sumText.toFloatOrNull()
+                sum?.let { sumFloat ->
+                    onSaveChanges(emailText, commentText, sumFloat)
+                } ?: run { sumTextError = true }
+            },
         ) {
             Text(
                 text = stringResource(R.string.save),

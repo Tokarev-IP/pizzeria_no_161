@@ -77,15 +77,13 @@ fun EditOrderScreen(
             onDeletePizza = { pizzaName ->
                 editOrderViewModel.setEvent(EditOrderUiEvent.DeletePizza(pizzaName))
             },
-            onSaveChanges = { email, comment ->
-                editOrderViewModel.setEvent(EditOrderUiEvent.UploadOrderData(email, comment))
+            onSaveChanges = { email, comment, sum ->
+                editOrderViewModel.setEvent(EditOrderUiEvent.UploadOrderData(email, comment, sum))
             },
-            onAddPizzaClicked = {
-                showPizzaBottomSheet = true
-            }
+            onAddPizzaClicked = { showPizzaBottomSheet = true }
         )
 
-        if (showPizzaBottomSheet){
+        if (showPizzaBottomSheet) {
             AddPizzaBottomSheet(
                 pizzaDataList = pizzaDataList,
                 onChoosePizza = { pizzaData ->
