@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Pizzeria No 161</string>
+    <string name="app_name">Pizzeria No.161</string>
     <string name="menu">Menu</string>
     <string name="new_orders">New Orders</string>
     <string name="completed_orders">Completed Orders</string>
@@ -48,17 +48,19 @@
     <string name="available">Available</string>
     <string name="unavailable">Unavailable</string>
     <string name="reason_of_rejection">Reason of Rejection</string>
+    <string name="reason_of_rejection_supporting_text">Keep it empty, if you do Not want to tell the reason</string>
     <string name="email_data">Email: %s</string>
     <string name="name_data">Name: %s</string>
     <string name="phone_data">Phone: %s</string>
     <string name="date_data">Date: %s</string>
     <string name="comment_data">Comment: %s</string>
     <string name="sum_data">Sum: %s ₽</string>
+    <string name="sum">Sum, ₽</string>
     <string name="email">Email</string>
     <string name="comment">Comment</string>
     <string name="time">Time</string>
     <string name="date">Date</string>
     <string name="open">Open</string>
     <string name="closed">Closed</string>
-    <string name="pizzeria_161">Pizzeria No 161</string>
+    <string name="pizzeria_161">Pizzeria No.161</string>
 </resources>
