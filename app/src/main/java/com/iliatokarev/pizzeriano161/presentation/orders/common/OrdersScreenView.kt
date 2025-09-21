@@ -1,7 +1,9 @@
 package com.iliatokarev.pizzeriano161.presentation.orders.common
 
+import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,15 +36,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import com.iliatokarev.pizzeriano161.R
 import com.iliatokarev.pizzeriano161.basic.ActionErrorView
 import com.iliatokarev.pizzeriano161.basic.shimmerBrush
+import com.iliatokarev.pizzeriano161.basic.toEmailLink
+import com.iliatokarev.pizzeriano161.basic.toTelLink
 import com.iliatokarev.pizzeriano161.domain.order.OrderData
 import com.iliatokarev.pizzeriano161.domain.order.orderDataListPreview
 import com.iliatokarev.pizzeriano161.presentation.compose.FlowGridLayout
@@ -219,7 +225,7 @@ private fun OrderItemView(
                     Text(
                         text = stringResource(R.string.status_new),
                         color = Color.Green,
-                        fontSize = 16.sp,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Medium,
                     )
                 }
@@ -229,7 +235,7 @@ private fun OrderItemView(
                     Text(
                         text = stringResource(R.string.status_rejected),
                         color = Color.Red,
-                        fontSize = 16.sp,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Medium,
                     )
                 }
@@ -239,7 +245,7 @@ private fun OrderItemView(
                     Text(
                         text = stringResource(R.string.status_confirmed),
                         color = Color.Green,
-                        fontSize = 16.sp,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Medium,
                     )
                 }
@@ -253,7 +259,10 @@ private fun OrderItemView(
                     onEditOrderClicked = { onEditOrderClicked(orderData) },
                 )
             }
-            OrderItemMainInfo(orderData = orderData)
+            OrderItemMainInfo(
+                orderData = orderData,
+                isLoading = isLoading,
+            )
             Spacer(modifier = Modifier.height(16.dp))
             OrderItemPizzaInfo(orderData = orderData)
         }
@@ -264,19 +273,24 @@ private fun OrderItemView(
 private fun OrderItemMainInfo(
     modifier: Modifier = Modifier,
     orderData: OrderData,
+    isLoading: Boolean,
 ) {
+    val context = LocalContext.current
+
     Column(modifier = modifier.fillMaxWidth()) {
         if (orderData.isCompleted)
             Text(
                 text = stringResource(R.string.completed_order),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
+                color = Color.Cyan,
             )
         else
             Text(
                 text = stringResource(R.string.new_order),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
+                color = Color.Cyan,
             )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -298,6 +312,16 @@ private fun OrderItemMainInfo(
             text = stringResource(R.string.phone_data, orderData.consumerPhone),
             fontSize = 16.sp,
             fontWeight = FontWeight.Normal,
+            color = Color.Blue,
+            modifier = modifier.clickable(
+                enabled = !isLoading,
+                onClick = {
+                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                        data = orderData.consumerName.toTelLink().toUri()
+                    }
+                    context.startActivity(intent)
+                },
+            )
         )
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -305,6 +329,16 @@ private fun OrderItemMainInfo(
             text = stringResource(R.string.email_data, orderData.consumerEmail),
             fontSize = 16.sp,
             fontWeight = FontWeight.Normal,
+            color = Color.Blue,
+            modifier = modifier.clickable(
+                enabled = !isLoading,
+                onClick = {
+                    val intent = Intent(Intent.ACTION_SENDTO).apply {
+                        data = orderData.consumerName.toEmailLink().toUri()
+                    }
+                    context.startActivity(intent)
+                },
+            )
         )
 
         Spacer(modifier = Modifier.height(4.dp))
