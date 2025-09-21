@@ -40,9 +40,7 @@ class MainViewModel(
 
 interface MainUiState : BasicUiState {
     class State(
-        val isShown: Boolean = true,
         val isLoading: Boolean = false,
-        val isErrorMessage: String? = null
     ) : MainUiState
 }
 
