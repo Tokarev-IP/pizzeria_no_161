@@ -61,7 +61,9 @@
     <string name="comment">Комментарий</string>
     <string name="time">Время</string>
     <string name="date">Дата</string>
-    <string name="open">Открыто</string>
-    <string name="closed">Закрыто</string>
+    <string name="open">Pizzeria161 открыта</string>
+    <string name="closed">Pizzeria161 закрыта</string>
     <string name="pizzeria_161">Pizzeria No.161</string>
+    <string name="oven_is_on">Печь включена</string>
+    <string name="oven_is_off">Печь выключена</string>
 </resources>

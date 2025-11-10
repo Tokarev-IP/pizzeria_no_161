@@ -4,6 +4,7 @@ import android.app.Application
 import com.google.firebase.Firebase
 import com.google.firebase.appcheck.appCheck
 import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
+import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.initialize
 import com.iliatokarev.pizzeriano161.data.firebaseModule
 import com.iliatokarev.pizzeriano161.domain.module.domainModules

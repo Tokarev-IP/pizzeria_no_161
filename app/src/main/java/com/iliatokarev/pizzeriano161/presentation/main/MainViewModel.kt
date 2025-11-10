@@ -7,7 +7,7 @@ import com.iliatokarev.pizzeriano161.basic.BasicViewModel
 import com.iliatokarev.pizzeriano161.presentation.main.MainUiIntent.*
 
 class MainViewModel(
-) : BasicViewModel<MainUiState, MainUiEvent, MainUiIntent>(MainUiState.State()) {
+) : BasicViewModel<MainUiState, MainUiEvent, MainUiIntent>(MainUiState.State) {
 
     override fun setEvent(event: MainUiEvent) {
         when (event) {
@@ -39,9 +39,7 @@ class MainViewModel(
 }
 
 interface MainUiState : BasicUiState {
-    class State(
-        val isLoading: Boolean = false,
-    ) : MainUiState
+    object State : MainUiState
 }
 
 sealed interface MainUiEvent : BasicUiEvent {

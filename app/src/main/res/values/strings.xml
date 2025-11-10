@@ -60,7 +60,9 @@
     <string name="comment">Comment</string>
     <string name="time">Time</string>
     <string name="date">Date</string>
-    <string name="open">Open</string>
-    <string name="closed">Closed</string>
+    <string name="open">Pizzeria161 is Open</string>
+    <string name="closed">Pizzeria161 is Closed</string>
     <string name="pizzeria_161">Pizzeria No.161</string>
+    <string name="oven_is_on">Oven is On</string>
+    <string name="oven_is_off">Oven is Off</string>
 </resources>

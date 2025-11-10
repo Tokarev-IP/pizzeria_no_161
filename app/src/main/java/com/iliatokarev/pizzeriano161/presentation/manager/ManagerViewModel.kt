@@ -1,6 +1,7 @@
 package com.iliatokarev.pizzeriano161.presentation.manager
 
 import androidx.lifecycle.viewModelScope
+import com.iliatokarev.pizzeriano161.basic.BasicFunResponseData
 import com.iliatokarev.pizzeriano161.basic.BasicFunctionResponse
 import com.iliatokarev.pizzeriano161.basic.BasicUiEvent
 import com.iliatokarev.pizzeriano161.basic.BasicUiIntent
@@ -18,17 +19,24 @@ class ManagerViewModel(
     private val isOpenFlow = MutableStateFlow<Boolean?>(null)
     private val isOpenFLowState = isOpenFlow.asStateFlow()
 
+    private val isOvenHot = MutableStateFlow<Boolean?>(null)
+    private val isOvenHotState = isOvenHot.asStateFlow()
+
     private fun setIsOpen(isOpen: Boolean) {
         isOpenFlow.value = isOpen
     }
 
+    private fun setIsOvenHot(isHot: Boolean) {
+        isOvenHot.value = isHot
+    }
+
     fun getIsOpen() = isOpenFLowState
+    fun getIsOvenHot() = isOvenHotState
 
     override fun setEvent(event: ManagerUiEvent) {
         when (event) {
-            is ManagerUiEvent.DoUserAuth -> {
-                authUser()
-                getIsOpenData()
+            is ManagerUiEvent.DoInitialActions -> {
+                doUserAuthAndData()
             }
 
             is ManagerUiEvent.ChangeIsOpenState -> {
@@ -36,39 +44,49 @@ class ManagerViewModel(
                     changeIsOpenState(isOpen)
                 }
             }
-        }
-    }
 
-    private fun authUser() {
-        viewModelScope.launch {
-            setUiState(ManagerUiState(isInitialLoading = true))
-            managerUseCase.signInUser().apply {
-                when (this) {
-                    is BasicFunctionResponse.Completed -> {
-                        setUiState(ManagerUiState())
-                    }
-
-                    is BasicFunctionResponse.Failed -> {
-                        setUiState(ManagerUiState(isInitialError = true))
-                    }
+            is ManagerUiEvent.ChangeIsOvenHotState -> {
+                isOvenHot.value?.let { isHot ->
+                    changeOvenData(!isHot)
                 }
             }
         }
     }
 
-    private fun getIsOpenData() {
+    private fun doUserAuthAndData() {
         viewModelScope.launch {
-            setUiState(ManagerUiState(isInitialLoading = true))
-            managerUseCase.getMainData().apply {
-                when (this) {
-                    is MainDataResponse.Success -> {
-                        setIsOpen(this.isOpen)
-                        setUiState(ManagerUiState())
-                    }
+            authUser()
+            getIsOpenData()
+            getIsOvenHotData()
+        }
+    }
 
-                    is MainDataResponse.Failed -> {
-                        setUiState(ManagerUiState(isInitialError = true))
-                    }
+    private suspend fun authUser() {
+        setUiState(ManagerUiState(isInitialLoading = true))
+        managerUseCase.signInUser().let {
+            when (it) {
+                is BasicFunctionResponse.Completed -> {
+                    setUiState(ManagerUiState())
+                }
+
+                is BasicFunctionResponse.Failed -> {
+                    setUiState(ManagerUiState(isInitialError = true))
+                }
+            }
+        }
+    }
+
+    private suspend fun getIsOpenData() {
+        setUiState(ManagerUiState(isLoading = true))
+        managerUseCase.getMainData().let {
+            when (it) {
+                is BasicFunResponseData.CompletedData -> {
+                    setIsOpen(it.data)
+                    setUiState(ManagerUiState())
+                }
+
+                is BasicFunResponseData.Failed -> {
+                    setUiState(ManagerUiState(isInitialError = true))
                 }
             }
         }
@@ -77,8 +95,8 @@ class ManagerViewModel(
     private fun changeIsOpenState(isOpen: Boolean) {
         viewModelScope.launch {
             setUiState(ManagerUiState(isLoading = true))
-            managerUseCase.changeMainData(isOpen).apply {
-                when (this) {
+            managerUseCase.changeMainData(isOpen).let {
+                when (it) {
                     is BasicFunctionResponse.Completed -> {
                         setIsOpen(!isOpen)
                         setUiState(ManagerUiState())
@@ -92,6 +110,42 @@ class ManagerViewModel(
             }
         }
     }
+
+    private fun getIsOvenHotData() {
+        viewModelScope.launch {
+            setUiState(ManagerUiState(isLoading = true))
+            managerUseCase.getOvenData().let {
+                when (it) {
+                    is BasicFunResponseData.CompletedData -> {
+                        setIsOvenHot(it.data)
+                        setUiState(ManagerUiState())
+                    }
+
+                    is BasicFunResponseData.Failed -> {
+                        setUiState(ManagerUiState(isError = true))
+                    }
+                }
+            }
+        }
+    }
+
+    private fun changeOvenData(data: Boolean) {
+        viewModelScope.launch {
+            setUiState(ManagerUiState(isLoading = true))
+            managerUseCase.changeOvenData(data).let {
+                when (it) {
+                    is BasicFunctionResponse.Completed -> {
+                        setIsOvenHot(data)
+                        setUiState(ManagerUiState())
+                    }
+
+                    is BasicFunctionResponse.Failed -> {
+                        setUiState(ManagerUiState(isError = true))
+                    }
+                }
+            }
+        }
+    }
 }
 
 class ManagerUiState(
@@ -102,8 +156,9 @@ class ManagerUiState(
 ) : BasicUiState
 
 sealed interface ManagerUiEvent : BasicUiEvent {
-    object DoUserAuth : ManagerUiEvent
+    object DoInitialActions : ManagerUiEvent
     object ChangeIsOpenState : ManagerUiEvent
+    object ChangeIsOvenHotState : ManagerUiEvent
 }
 
 sealed interface ManagerUiIntent : BasicUiIntent

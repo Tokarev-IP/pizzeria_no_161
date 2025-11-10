@@ -73,3 +73,8 @@ class MessageData(
 class FirebaseMainData(
     val open: Boolean = true,
 )
+
+@Serializable
+class FirebaseOvenData(
+    val hot: Boolean = false,
+)

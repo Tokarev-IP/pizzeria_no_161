@@ -11,4 +11,5 @@ val firebaseModule = module {
     factoryOf(::FirebaseAuth) { bind<FirebaseAuthInterface>() }
     factoryOf(::FirebaseFirestoreEmail) { bind<FirebaseFirestoreEmailInterface>() }
     factoryOf(::FirebaseFirestoreMain) { bind<FirebaseFirestoreMainInterface>() }
+    factoryOf(::FirebaseFirestoreOven) { bind<FirebaseFirestoreOvenInterface>() }
 }

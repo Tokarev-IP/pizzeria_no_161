@@ -19,3 +19,17 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Kotlinx Serialization
+-keep class kotlinx.serialization.** { *; }
+-keep @kotlinx.serialization.Serializable class * { *; }
+
+# @Serializable
+-keepclassmembers class * {
+    @kotlinx.serialization.SerialName <fields>;
+}
+
+#Firebase @PropertyName
+-keepclassmembers class * {
+    @com.google.firebase.firestore.PropertyName <fields>;
+}

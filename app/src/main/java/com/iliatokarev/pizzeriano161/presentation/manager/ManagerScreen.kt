@@ -29,6 +29,7 @@ fun ManagerScreen(
 ) {
     val uiState by managerViewModel.getUiState().collectAsStateWithLifecycle()
     val isOpen by managerViewModel.getIsOpen().collectAsStateWithLifecycle()
+    val isOveHot by managerViewModel.getIsOvenHot().collectAsStateWithLifecycle()
 
     LaunchedEffect(uiState) {
         if (uiState.isError)
@@ -62,12 +63,16 @@ fun ManagerScreen(
             },
             uiState = uiState,
             onTryAuthAgainClicked = {
-                managerViewModel.setEvent(ManagerUiEvent.DoUserAuth)
+                managerViewModel.setEvent(ManagerUiEvent.DoInitialActions)
             },
             isOpen = isOpen,
             onIsOpenStateChanged = {
                 managerViewModel.setEvent(ManagerUiEvent.ChangeIsOpenState)
             },
+            isOveHot = isOveHot,
+            onIsHotStateChanged = {
+                managerViewModel.setEvent(ManagerUiEvent.ChangeIsOvenHotState)
+            }
         )
     }
 }

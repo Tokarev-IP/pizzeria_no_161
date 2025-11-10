@@ -23,8 +23,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,25 +48,27 @@ fun ManagerScreenView(
     onTryAuthAgainClicked: () -> Unit,
     isOpen: Boolean?,
     onIsOpenStateChanged: () -> Unit,
+    isOveHot: Boolean?,
+    onIsHotStateChanged: () -> Unit,
 ) {
     Box(modifier = modifier) {
-        if (uiState.isInitialLoading) {
-            ShimmedView()
-        } else if (uiState.isInitialError) {
+        if (uiState.isInitialError) {
             ActionErrorView { onTryAuthAgainClicked() }
+        } else if (isOpen == null || isOveHot == null) {
+            ShimmedView()
         } else {
             AnimatedVisibility(uiState.isLoading) {
                 LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
             }
-            isOpen?.let { open ->
-                ManagerView(
-                    onAllPizzaClicked = { onAllPizzaClicked() },
-                    onNewOrdersClicked = { onNewOrdersClicked() },
-                    onCompletedOrdersClicked = { onCompletedOrdersClicked() },
-                    isOpen = open,
-                    onIsOpenStateChanged = { onIsOpenStateChanged() },
-                )
-            } ?: run { ShimmedView() }
+            ManagerView(
+                onAllPizzaClicked = { onAllPizzaClicked() },
+                onNewOrdersClicked = { onNewOrdersClicked() },
+                onCompletedOrdersClicked = { onCompletedOrdersClicked() },
+                isOpen = isOpen,
+                onIsOpenStateChanged = { onIsOpenStateChanged() },
+                isOvenHot = isOveHot,
+                onIsHotStateChanged = { onIsHotStateChanged() },
+            )
         }
     }
 }
@@ -73,6 +81,8 @@ private fun ManagerView(
     onCompletedOrdersClicked: () -> Unit = {},
     isOpen: Boolean = true,
     onIsOpenStateChanged: () -> Unit = {},
+    isOvenHot: Boolean = false,
+    onIsHotStateChanged: () -> Unit = {},
 ) {
     LazyColumn(
         modifier = modifier
@@ -88,13 +98,23 @@ private fun ManagerView(
                 fontWeight = FontWeight.Medium,
             )
             Spacer(modifier = Modifier.height(20.dp))
-            OpenSwitchView(
+            WebLinkText()
+            Spacer(modifier = Modifier.height(36.dp))
+            HorizontalDivider()
+            Spacer(modifier = Modifier.height(20.dp))
+
+            IsOpenSwitchView(
                 isOpen = isOpen,
                 onIsOpenStateChanged = { onIsOpenStateChanged() },
             )
-            Spacer(modifier = Modifier.height(36.dp))
+            Spacer(modifier = Modifier.height(20.dp))
+            IsHotSwitchView(
+                isHot = isOvenHot,
+                onIsHotStateChanged = { onIsHotStateChanged() },
+            )
+            Spacer(modifier = Modifier.height(20.dp))
             HorizontalDivider()
-            Spacer(modifier = Modifier.height(36.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             OutlinedButton(
                 modifier = modifier.fillMaxWidth(),
@@ -123,7 +143,23 @@ private fun ManagerView(
 }
 
 @Composable
-private fun OpenSwitchView(
+private fun WebLinkText(){
+    Text(
+        buildAnnotatedString {
+            withLink(
+                LinkAnnotation.Url(
+                    "https://pizzeria-161.web.app/",
+                    TextLinkStyles(style = SpanStyle(color = Color.Cyan))
+                )
+            ) {
+                append("pizzeria-161.web.app")
+            }
+        }
+    )
+}
+
+@Composable
+private fun IsOpenSwitchView(
     modifier: Modifier = Modifier,
     isOpen: Boolean,
     onIsOpenStateChanged: () -> Unit,
@@ -132,7 +168,9 @@ private fun OpenSwitchView(
         modifier = modifier.fillMaxWidth(),
     ) {
         Row(
-            modifier = modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -156,6 +194,47 @@ private fun OpenSwitchView(
             Switch(
                 checked = isOpen,
                 onCheckedChange = { onIsOpenStateChanged() },
+            )
+        }
+    }
+}
+
+@Composable
+private fun IsHotSwitchView(
+    modifier: Modifier = Modifier,
+    isHot: Boolean,
+    onIsHotStateChanged: () -> Unit,
+) {
+    OutlinedCard(
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            AnimatedContent(
+                targetState = isHot,
+            ) { hot ->
+                if (hot)
+                    Text(
+                        text = stringResource(R.string.oven_is_on),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal,
+                    )
+                else
+                    Text(
+                        text = stringResource(R.string.oven_is_off),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal,
+                    )
+            }
+
+            Switch(
+                checked = isHot,
+                onCheckedChange = { onIsHotStateChanged() },
             )
         }
     }

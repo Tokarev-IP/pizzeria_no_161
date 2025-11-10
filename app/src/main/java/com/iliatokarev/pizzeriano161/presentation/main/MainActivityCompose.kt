@@ -70,7 +70,7 @@ fun MainActivityCompose(
         entryProvider = entryProvider {
             entry<ScreensNavigation.ManagerScreenNav> {
                 val managerViewModel: ManagerViewModel = koinViewModel()
-                managerViewModel.setEvent(ManagerUiEvent.DoUserAuth)
+                managerViewModel.setEvent(ManagerUiEvent.DoInitialActions)
 
                 ManagerScreen(
                     mainViewModel = mainViewModel,
