@@ -67,7 +67,7 @@ internal fun RejectionOrderDialog(
                 Spacer(modifier = modifier.height(20.dp))
                 CancelAcceptButtonView(
                     onCancelClicked = { onDismissRequest() },
-                    onAcceptClicked = { onAcceptClicked(textState) },
+                    onAcceptClicked = { onAcceptClicked(textState.trim()) },
                 )
             }
         }
