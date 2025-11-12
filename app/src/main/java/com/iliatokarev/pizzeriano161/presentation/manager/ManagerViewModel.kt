@@ -122,7 +122,7 @@ class ManagerViewModel(
                     }
 
                     is BasicFunResponseData.Failed -> {
-                        setUiState(ManagerUiState(isError = true))
+                        setUiState(ManagerUiState(isInitialError = true))
                     }
                 }
             }

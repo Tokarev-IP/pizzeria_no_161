@@ -54,21 +54,23 @@ fun ManagerScreenView(
     Box(modifier = modifier) {
         if (uiState.isInitialError) {
             ActionErrorView { onTryAuthAgainClicked() }
-        } else if (isOpen == null || isOveHot == null) {
-            ShimmedView()
         } else {
-            AnimatedVisibility(uiState.isLoading) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            if (isOpen == null || isOveHot == null) {
+                ShimmedView()
+            } else {
+                AnimatedVisibility(uiState.isLoading) {
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                }
+                ManagerView(
+                    onAllPizzaClicked = { onAllPizzaClicked() },
+                    onNewOrdersClicked = { onNewOrdersClicked() },
+                    onCompletedOrdersClicked = { onCompletedOrdersClicked() },
+                    isOpen = isOpen,
+                    onIsOpenStateChanged = { onIsOpenStateChanged() },
+                    isOvenHot = isOveHot,
+                    onIsHotStateChanged = { onIsHotStateChanged() },
+                )
             }
-            ManagerView(
-                onAllPizzaClicked = { onAllPizzaClicked() },
-                onNewOrdersClicked = { onNewOrdersClicked() },
-                onCompletedOrdersClicked = { onCompletedOrdersClicked() },
-                isOpen = isOpen,
-                onIsOpenStateChanged = { onIsOpenStateChanged() },
-                isOvenHot = isOveHot,
-                onIsHotStateChanged = { onIsHotStateChanged() },
-            )
         }
     }
 }
@@ -143,7 +145,7 @@ private fun ManagerView(
 }
 
 @Composable
-private fun WebLinkText(){
+private fun WebLinkText() {
     Text(
         buildAnnotatedString {
             withLink(
