@@ -1,4 +1,4 @@
-package com.iliatokarev.pizzeriano161.data
+package com.iliatokarev.pizzeriano161.data.firebase
 
 class FirebaseFirestoreMain() : FirebaseFirestoreMainInterface, FirebaseFirestore() {
 

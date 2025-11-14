@@ -1,7 +1,7 @@
 package com.iliatokarev.pizzeriano161.domain.pizza
 
 import android.net.Uri
-import com.iliatokarev.pizzeriano161.data.FirebasePizzaData
+import com.iliatokarev.pizzeriano161.data.firebase.FirebasePizzaData
 
 data class PizzaData(
     val id: String,

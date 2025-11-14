@@ -31,8 +31,11 @@ fun UncompletedOrdersScreen(
     mainViewModel: MainViewModel,
     localContext: Context = LocalContext.current,
 ) {
-    val uiState by uncompletedOrdersViewModel.getUiState().collectAsStateWithLifecycle()
+    val uiState by uncompletedOrdersViewModel.getUiState()
+        .collectAsStateWithLifecycle()
     val ordersDataList by uncompletedOrdersViewModel.getUncompletedOrdersList()
+        .collectAsStateWithLifecycle()
+    val rejectionReasonsList by uncompletedOrdersViewModel.getRejectionReasonList()
         .collectAsStateWithLifecycle()
 
     var showDeletionDialog by rememberSaveable { mutableStateOf(false) }
@@ -153,7 +156,7 @@ fun UncompletedOrdersScreen(
             }
         }
 
-        if (showMarkAsRejectedDialog){
+        if (showMarkAsRejectedDialog) {
             orderIdToMarkAsRejected?.let { id ->
                 RejectionOrderDialog(
                     onDismissRequest = {
@@ -170,7 +173,18 @@ fun UncompletedOrdersScreen(
                         showMarkAsRejectedDialog = false
                         orderIdToMarkAsRejected = null
                     },
-                    infoText = stringResource(R.string.mark_order_as_rejected_dialog_text)
+                    infoText = stringResource(R.string.mark_order_as_rejected_dialog_text),
+                    rejectionReasonsList = rejectionReasonsList,
+                    onAddReason = { reason ->
+                        uncompletedOrdersViewModel.setEvent(
+                            UncompletedOrdersUiEvent.AddRejectionReason(reason)
+                        )
+                    },
+                    onDeleteReasonById = { id ->
+                        uncompletedOrdersViewModel.setEvent(
+                            UncompletedOrdersUiEvent.DeleteRejectionReason(id)
+                        )
+                    }
                 )
             }
         }

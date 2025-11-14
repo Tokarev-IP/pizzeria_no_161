@@ -1,6 +1,6 @@
 package com.iliatokarev.pizzeriano161.domain.message
 
-import com.iliatokarev.pizzeriano161.data.FirebaseFirestoreEmailInterface
+import com.iliatokarev.pizzeriano161.data.firebase.FirebaseFirestoreEmailInterface
 import com.iliatokarev.pizzeriano161.domain.order.OrderData
 import kotlinx.coroutines.withTimeout
 

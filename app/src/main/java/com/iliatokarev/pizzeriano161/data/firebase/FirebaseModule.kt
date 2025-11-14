@@ -1,4 +1,4 @@
-package com.iliatokarev.pizzeriano161.data
+package com.iliatokarev.pizzeriano161.data.firebase
 
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.factoryOf

@@ -1,7 +1,7 @@
 package com.iliatokarev.pizzeriano161.domain.oven
 
-import com.iliatokarev.pizzeriano161.data.FirebaseFirestoreOvenInterface
-import com.iliatokarev.pizzeriano161.data.FirebaseOvenData
+import com.iliatokarev.pizzeriano161.data.firebase.FirebaseFirestoreOvenInterface
+import com.iliatokarev.pizzeriano161.data.firebase.FirebaseOvenData
 import kotlinx.coroutines.withTimeout
 
 class OvenDataUseCase(

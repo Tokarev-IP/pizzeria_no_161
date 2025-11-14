@@ -1,6 +1,6 @@
 package com.iliatokarev.pizzeriano161.domain.auth
 
-import com.iliatokarev.pizzeriano161.data.FirebaseAuthInterface
+import com.iliatokarev.pizzeriano161.data.firebase.FirebaseAuthInterface
 import kotlinx.coroutines.withTimeout
 
 class AuthUseCase(

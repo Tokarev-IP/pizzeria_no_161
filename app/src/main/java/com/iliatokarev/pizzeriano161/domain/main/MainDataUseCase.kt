@@ -1,7 +1,7 @@
 package com.iliatokarev.pizzeriano161.domain.main
 
-import com.iliatokarev.pizzeriano161.data.FirebaseFirestoreMainInterface
-import com.iliatokarev.pizzeriano161.data.FirebaseMainData
+import com.iliatokarev.pizzeriano161.data.firebase.FirebaseFirestoreMainInterface
+import com.iliatokarev.pizzeriano161.data.firebase.FirebaseMainData
 
 class MainDataUseCase(
     private val firebaseFirestoreMain: FirebaseFirestoreMainInterface,

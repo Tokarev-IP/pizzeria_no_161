@@ -6,7 +6,8 @@ import com.google.firebase.appcheck.appCheck
 import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.initialize
-import com.iliatokarev.pizzeriano161.data.firebaseModule
+import com.iliatokarev.pizzeriano161.data.firebase.firebaseModule
+import com.iliatokarev.pizzeriano161.data.room.roomModule
 import com.iliatokarev.pizzeriano161.domain.module.domainModules
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -18,7 +19,7 @@ class MainApp : Application(){
 
         startKoin {
             androidContext(this@MainApp)
-            modules(mainModule, firebaseModule, domainModules)
+            modules(mainModule, firebaseModule, domainModules, roomModule)
         }
 
         Firebase.initialize(context = this)

@@ -1,7 +1,7 @@
 package com.iliatokarev.pizzeriano161.domain.order
 
-import com.iliatokarev.pizzeriano161.data.FirebaseFirestoreOrderInterface
-import com.iliatokarev.pizzeriano161.data.toOrderData
+import com.iliatokarev.pizzeriano161.data.firebase.FirebaseFirestoreOrderInterface
+import com.iliatokarev.pizzeriano161.data.firebase.toOrderData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
 

@@ -2,8 +2,8 @@ package com.iliatokarev.pizzeriano161.presentation.manager
 
 import com.iliatokarev.pizzeriano161.basic.BasicFunResponseData
 import com.iliatokarev.pizzeriano161.basic.BasicFunctionResponse
-import com.iliatokarev.pizzeriano161.data.FirebaseMainData
-import com.iliatokarev.pizzeriano161.data.FirebaseOvenData
+import com.iliatokarev.pizzeriano161.data.firebase.FirebaseMainData
+import com.iliatokarev.pizzeriano161.data.firebase.FirebaseOvenData
 import com.iliatokarev.pizzeriano161.domain.auth.AuthUseCaseInterface
 import com.iliatokarev.pizzeriano161.domain.main.MainDataUseCaseInterface
 import com.iliatokarev.pizzeriano161.domain.oven.OvenDataUseCaseInterface

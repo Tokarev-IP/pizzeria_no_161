@@ -6,14 +6,17 @@ import com.iliatokarev.pizzeriano161.basic.BasicUiIntent
 import com.iliatokarev.pizzeriano161.basic.BasicUiState
 import com.iliatokarev.pizzeriano161.basic.BasicViewModel
 import com.iliatokarev.pizzeriano161.domain.order.OrderData
+import com.iliatokarev.pizzeriano161.domain.rejection.RejectionData
 import com.iliatokarev.pizzeriano161.presentation.orders.common.OrderDataResponse
 import com.iliatokarev.pizzeriano161.presentation.orders.common.OrdersUseCaseInterface
+import com.iliatokarev.pizzeriano161.presentation.orders.common.RejectionReasonUseCaseInterface
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class UncompletedOrdersViewModel(
     private val ordersUseCase: OrdersUseCaseInterface,
+    private val rejectionReasonUseCase: RejectionReasonUseCaseInterface,
 ) : BasicViewModel<UncompletedOrdersUiState, UncompletedOrdersUiEvent, UncompletedOrdersUiIntent>(
     UncompletedOrdersUiState(isInitialLoading = true)
 ) {
@@ -26,6 +29,15 @@ class UncompletedOrdersViewModel(
 
     fun getUncompletedOrdersList() = uncompletedOrdersListFlow
 
+    private val rejectionReasonList = MutableStateFlow<List<RejectionData>>(emptyList())
+    private val rejectionReasonListFlow = rejectionReasonList.asStateFlow()
+
+    fun getRejectionReasonList() = rejectionReasonListFlow
+
+    private fun setRejectionReasonList(reasonList: List<RejectionData>) {
+        rejectionReasonList.value = reasonList
+    }
+
     override fun setEvent(event: UncompletedOrdersUiEvent) {
         when (event) {
             is UncompletedOrdersUiEvent.DeleteOrder -> {
@@ -37,6 +49,7 @@ class UncompletedOrdersViewModel(
 
             is UncompletedOrdersUiEvent.LoadUncompletedOrders -> {
                 getUncompletedOrders()
+                monitorRejectionReasons()
             }
 
             is UncompletedOrdersUiEvent.MarkOrdersAsCompleted -> {
@@ -70,6 +83,14 @@ class UncompletedOrdersViewModel(
                         rejectionReason = event.rejectedReason,
                     )
                 }
+            }
+
+            is UncompletedOrdersUiEvent.AddRejectionReason -> {
+                addRejectionReason(event.reason)
+            }
+
+            is UncompletedOrdersUiEvent.DeleteRejectionReason -> {
+                deleteRejectionReason(event.id)
             }
         }
     }
@@ -180,6 +201,26 @@ class UncompletedOrdersViewModel(
             }
         }
     }
+
+    private fun monitorRejectionReasons() {
+        viewModelScope.launch {
+            rejectionReasonUseCase.getRejectionReasonListFlow().collect { reasonList ->
+                setRejectionReasonList(reasonList)
+            }
+        }
+    }
+
+    private fun deleteRejectionReason(id: Int) {
+        viewModelScope.launch {
+            rejectionReasonUseCase.deleteRejectionReason(id)
+        }
+    }
+
+    private fun addRejectionReason(reason: String) {
+        viewModelScope.launch {
+            rejectionReasonUseCase.addRejectionReason(reason)
+        }
+    }
 }
 
 class UncompletedOrdersUiState(
@@ -197,6 +238,9 @@ sealed interface UncompletedOrdersUiEvent : BasicUiEvent {
     class MarkOrderAsConfirmed(val orderId: String) : UncompletedOrdersUiEvent
     class MarkOrderAsRejected(val orderId: String, val rejectedReason: String) :
         UncompletedOrdersUiEvent
+
+    class DeleteRejectionReason(val id: Int) : UncompletedOrdersUiEvent
+    class AddRejectionReason(val reason: String) : UncompletedOrdersUiEvent
 }
 
 interface UncompletedOrdersUiIntent : BasicUiIntent

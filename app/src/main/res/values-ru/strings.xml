@@ -66,4 +66,6 @@
     <string name="pizzeria_161">Pizzeria No.161</string>
     <string name="oven_is_on">Печь включена</string>
     <string name="oven_is_off">Печь выключена</string>
+    <string name="standard_rejection_reason">Добавьте стандартную причину для отказа</string>
+    <string name="you_can_add_standard_rejection_reason">Вы можете добавить стандартную причину отказа и использовать ее потом</string>
 </resources>

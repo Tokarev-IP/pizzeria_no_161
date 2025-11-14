@@ -1,8 +1,8 @@
 package com.iliatokarev.pizzeriano161.domain.pizza
 
-import com.iliatokarev.pizzeriano161.data.FirebaseFirestorePizzaInterface
-import com.iliatokarev.pizzeriano161.data.FirebaseStorageInterface
-import com.iliatokarev.pizzeriano161.data.toPizzaData
+import com.iliatokarev.pizzeriano161.data.firebase.FirebaseFirestorePizzaInterface
+import com.iliatokarev.pizzeriano161.data.firebase.FirebaseStorageInterface
+import com.iliatokarev.pizzeriano161.data.firebase.toPizzaData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
 

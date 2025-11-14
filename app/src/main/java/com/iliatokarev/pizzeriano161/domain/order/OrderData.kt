@@ -1,7 +1,7 @@
 package com.iliatokarev.pizzeriano161.domain.order
 
 import com.iliatokarev.pizzeriano161.basic.TimeUtilsForOrder
-import com.iliatokarev.pizzeriano161.data.FirebaseOrderData
+import com.iliatokarev.pizzeriano161.data.firebase.FirebaseOrderData
 
 data class OrderData(
     val id: String,

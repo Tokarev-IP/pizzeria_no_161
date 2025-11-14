@@ -65,4 +65,6 @@
     <string name="pizzeria_161">Pizzeria No.161</string>
     <string name="oven_is_on">Oven is On</string>
     <string name="oven_is_off">Oven is Off</string>
+    <string name="standard_rejection_reason">Standard Rejection Reason</string>
+    <string name="you_can_add_standard_rejection_reason">You can add a Standard Rejection Reason and use it later</string>
 </resources>
