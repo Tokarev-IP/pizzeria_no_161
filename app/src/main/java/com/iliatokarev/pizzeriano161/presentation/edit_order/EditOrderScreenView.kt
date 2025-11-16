@@ -405,9 +405,9 @@ private fun TimePickerDialogView(
                     Button(
                         onClick = {
                             val hour =
-                                if (timePickerState.hour == 0) "00" else timePickerState.hour.toString()
+                                if (timePickerState.hour in 0..9) "0${timePickerState.hour}" else timePickerState.hour.toString()
                             val minute =
-                                if (timePickerState.minute == 0) "00" else timePickerState.minute.toString()
+                                if (timePickerState.minute in 0 .. 9) "0${timePickerState.minute}" else timePickerState.minute.toString()
                             val time = "$hour:$minute"
                             onConfirm(time)
                         },
