@@ -22,14 +22,14 @@ class MainApp : Application(){
             modules(mainModule, firebaseModule, domainModules, roomModule)
         }
 
-        Firebase.initialize(context = this)
-        Firebase.appCheck.installAppCheckProviderFactory(
-            DebugAppCheckProviderFactory.getInstance(),
-        )
-
 //        Firebase.initialize(context = this)
 //        Firebase.appCheck.installAppCheckProviderFactory(
-//            PlayIntegrityAppCheckProviderFactory.getInstance(),
+//            DebugAppCheckProviderFactory.getInstance(),
 //        )
+
+        Firebase.initialize(context = this)
+        Firebase.appCheck.installAppCheckProviderFactory(
+            PlayIntegrityAppCheckProviderFactory.getInstance(),
+        )
     }
 }

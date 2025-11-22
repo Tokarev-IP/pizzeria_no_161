@@ -151,7 +151,7 @@ private fun WebLinkText() {
             withLink(
                 LinkAnnotation.Url(
                     "https://pizzeria-161.web.app/",
-                    TextLinkStyles(style = SpanStyle(color = Color.Cyan))
+                    TextLinkStyles(style = SpanStyle(color = Color.Blue))
                 )
             ) {
                 append("pizzeria-161.web.app")
